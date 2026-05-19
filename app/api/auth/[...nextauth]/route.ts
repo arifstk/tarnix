@@ -38,27 +38,78 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
+    // async signIn({ user, account }) {
+    //   if (account?.provider === "google") {
+    //     await connectDB();
+    //     await User.findOneAndUpdate(
+    //       { email: user.email },
+    //       { name: user.name, image: user.image },
+    //       { upsert: true, new: true },
+    //     );
+    //   }
+    //   return true;
+    // },
+
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         await connectDB();
+        const userCount = await User.countDocuments();
+        const existingUser = await User.findOne({ email: user.email });
+
         await User.findOneAndUpdate(
           { email: user.email },
-          { name: user.name, image: user.image },
+          {
+            name: user.name,
+            image: user.image,
+            ...(!existingUser && { role: userCount === 0 ? "admin" : "user" }),
+          },
           { upsert: true, new: true },
         );
       }
       return true;
     },
+
+    // async jwt({ token, user }) {
+    //   if (user) {
+    //     await connectDB();
+    //     const dbUser = await User.findOne({ email: token.email });
+    //     token.role = dbUser?.role ?? "user";
+    //     token.id = dbUser?._id.toString();
+    //   }
+    //   return token;
+    // },
+    // async session({ session, token }) {
+    //   if (session.user) {
+    //     (session.user as any).role = token.role;
+    //     (session.user as any).id = token.id;
+    //   }
+    //   return session;
+    // },
+
     async jwt({ token, user }) {
-      if (user) {
-        await connectDB();
-        const dbUser = await User.findOne({ email: token.email });
-        token.role = dbUser?.role ?? "user";
-        token.id = dbUser?._id.toString();
+      await connectDB();
+      const dbUser = await User.findOne({ email: token.email });
+
+      if (!dbUser) {
+        // User deleted from DB — poison the token
+        token.error = "UserDeleted";
+        return token;
       }
+
+      token.role = dbUser.role;
+      token.id = dbUser._id.toString();
       return token;
     },
+
     async session({ session, token }) {
+      if (token.error === "UserDeleted") {
+        // Expired session forces client-side logout
+        return {
+          ...session,
+          user: undefined,
+          expires: new Date(0).toISOString(),
+        };
+      }
       if (session.user) {
         (session.user as any).role = token.role;
         (session.user as any).id = token.id;
@@ -72,4 +123,3 @@ export const authOptions: AuthOptions = {
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
-
