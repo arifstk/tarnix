@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
-import Header from "@/components/Header";
-
+import HeaderWrapper from "@/components/HeaderWrapper";
 
 export const metadata: Metadata = {
   title: "Tarnix",
@@ -21,7 +20,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>
-          {/* <Header /> */}
+          <HeaderWrapper />
           <main>{children}</main>
         </Providers>
       </body>

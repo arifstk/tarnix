@@ -128,7 +128,7 @@ const MobileNav = ({ role }: MobileNavProps) => {
                 </svg>
                 Manage Products
               </Link>
-              <Link href="/admin/users" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150">
+              <Link href="/admin/categories" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150">
                 <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                   <TbCategoryPlus className="text-3xl"/>
                 </svg>
