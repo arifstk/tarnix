@@ -7,7 +7,7 @@ export interface IUserDoc extends Document {
   email: string;
   image?: string;
   password?: string;
-  role: "user" | "admin";
+  role: "user" | "admin" |"deliveryBoy";
 }
 
 const UserSchema = new Schema<IUserDoc>(
@@ -16,7 +16,7 @@ const UserSchema = new Schema<IUserDoc>(
     email: { type: String, required: true, unique: true },
     image: { type: String },
     password: { type: String },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    role: { type: String, enum: ["user", "admin", "deliveryBoy"], default: "user" },
   },
   { timestamps: true },
 );

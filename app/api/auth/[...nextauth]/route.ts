@@ -37,19 +37,8 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    // async signIn({ user, account }) {
-    //   if (account?.provider === "google") {
-    //     await connectDB();
-    //     await User.findOneAndUpdate(
-    //       { email: user.email },
-    //       { name: user.name, image: user.image },
-    //       { upsert: true, new: true },
-    //     );
-    //   }
-    //   return true;
-    // },
 
+  callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         await connectDB();
@@ -61,6 +50,7 @@ export const authOptions: AuthOptions = {
           {
             name: user.name,
             image: user.image,
+            email: user.email,
             ...(!existingUser && { role: userCount === 0 ? "admin" : "user" }),
           },
           { upsert: true, new: true },
@@ -69,26 +59,11 @@ export const authOptions: AuthOptions = {
       return true;
     },
 
-    // async jwt({ token, user }) {
-    //   if (user) {
-    //     await connectDB();
-    //     const dbUser = await User.findOne({ email: token.email });
-    //     token.role = dbUser?.role ?? "user";
-    //     token.id = dbUser?._id.toString();
-    //   }
-    //   return token;
-    // },
-    // async session({ session, token }) {
-    //   if (session.user) {
-    //     (session.user as any).role = token.role;
-    //     (session.user as any).id = token.id;
-    //   }
-    //   return session;
-    // },
-
     async jwt({ token, user }) {
       await connectDB();
+      console.log("JWT token.email:", token.email);
       const dbUser = await User.findOne({ email: token.email });
+      // console.log("DB user found:", dbUser);
 
       if (!dbUser) {
         // User deleted from DB — poison the token
