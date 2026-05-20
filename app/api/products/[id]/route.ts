@@ -16,16 +16,16 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } },
+  req: Request, { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if ((session?.user as any)?.role !== "admin")
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   await connectDB();
-  const product = await Product.findById(params.id);
+  const product = await Product.findById(id);
   if (!product)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -37,7 +37,7 @@ export async function PUT(
     delete body.imageBase64;
   }
 
-  const updated = await Product.findByIdAndUpdate(params.id, body, {
+  const updated = await Product.findByIdAndUpdate(id, body, {
     new: true,
   });
   return NextResponse.json(updated);
