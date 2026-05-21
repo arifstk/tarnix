@@ -2,12 +2,17 @@
 
 
 import React from 'react'
+import Hero from './Hero'
 
 const UserDashboard = () => {
   return (
-    <div>
-      User Dashboard content
-      <div>hero
+    <div >
+      {/* Banner */}
+      <div className='p-4 md:p-6'>
+        <Hero />
+      </div>
+      {/* products */}
+      <div className='p-4 md:p-6'>
         <div className='text-3xl'>product</div>
       </div>
     </div>
