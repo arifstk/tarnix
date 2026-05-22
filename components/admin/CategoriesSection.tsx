@@ -2,15 +2,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import toast, { Toaster } from "react-hot-toast";
 import { AppDispatch, RootState } from "@/store";
 import {
   fetchCategories,
   deleteCategory,
 } from "@/store/slices/categorySlice";
 import { ICategory } from "@/types";
-// import CategoryModal from "./CategoryModal";
-import DeleteConfirmModal from "./DeleteConfirmModal";
 import CategoryModal from "./CategoryModel";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 export default function CategoriesSection() {
   const dispatch = useDispatch<AppDispatch>();
@@ -18,7 +18,6 @@ export default function CategoriesSection() {
     (s: RootState) => s.categories
   );
 
-  // null = closed, "new" = add mode, ICategory = edit mode
   const [catModal, setCatModal] = useState<null | "new" | ICategory>(null);
   const [deleteTarget, setDeleteTarget] = useState<ICategory | null>(null);
 
@@ -26,14 +25,54 @@ export default function CategoriesSection() {
     dispatch(fetchCategories());
   }, [dispatch]);
 
-  const handleDelete = async () => {
+  // ── Delete with toast ──────────────────────────────────────
+  const handleDelete = () => {
     if (!deleteTarget) return;
-    await dispatch(deleteCategory(deleteTarget._id!));
-    setDeleteTarget(null);
+    const name = deleteTarget.name;
+    toast.promise(
+      dispatch(deleteCategory(deleteTarget._id!)).unwrap(),
+      {
+        loading: "Deleting category…",
+        success: `"${name}" deleted successfully 🗑`,
+        error:   (err) => `Failed to delete: ${err}`,
+      }
+    ).then(() => setDeleteTarget(null)).catch(() => {});
+  };
+
+  // ── Add / Edit success toast (called from CategoryModal) ───
+  const handleModalSuccess = (mode: "add" | "edit", name: string) => {
+    toast.success(
+      mode === "add"
+        ? `"${name}" category added! 🏷`
+        : `"${name}" updated successfully ✅`,
+      { duration: 3500 }
+    );
+    setCatModal(null);
   };
 
   return (
     <div className="max-w-2xl space-y-4">
+
+      {/* Toast container — dark theme matching dashboard */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: "#1e293b",
+            color: "#f1f5f9",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "12px",
+            fontSize: "13px",
+            fontWeight: 600,
+            padding: "12px 16px",
+          },
+          success: { iconTheme: { primary: "#34d399", secondary: "#0f1420" } },
+          error:   { iconTheme: { primary: "#f87171", secondary: "#0f1420" } },
+          loading: { iconTheme: { primary: "#818cf8", secondary: "#0f1420" } },
+        }}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -118,6 +157,7 @@ export default function CategoriesSection() {
         <CategoryModal
           existing={catModal === "new" ? null : catModal}
           onClose={() => setCatModal(null)}
+          onSuccess={handleModalSuccess}   // ← passes toast trigger into modal
         />
       )}
       {deleteTarget && (
@@ -129,5 +169,4 @@ export default function CategoriesSection() {
       )}
     </div>
   );
-} 
-
+}

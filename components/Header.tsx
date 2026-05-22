@@ -20,7 +20,7 @@ const Header = ({ role }: NavbarProps) => {
   const isDeliveryBoy= role === "deliveryBoy";
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md shadow-[0_1px_30px_rgba(0,0,0,0.4)]">
+    <header className="sticky top-0 z-50 backdrop-blur-md shadow-[0_1px_30px_rgba(0,0,0,0.4)] border-b border-white/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Logo + Mobile hamburger */}
@@ -36,7 +36,7 @@ const Header = ({ role }: NavbarProps) => {
         {/* ── Logo (all roles) ── */}
         <div className="hidden md:flex items-center">
           <Link href="/">
-            <h2 className="text-2xl text-tarnix_dark_green font-black tracking-wider hover:text-tarnix_light_green hoverEffect group font-sans">
+            <h2 className="text-2xl text-blue-600 font-black tracking-wider hover:text-tarnix_light_green hoverEffect group font-sans">
               Tarnix
             </h2>
           </Link>

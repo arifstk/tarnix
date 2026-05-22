@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import HeaderWrapper from "@/components/HeaderWrapper";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Tarnix",
@@ -21,7 +22,13 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <HeaderWrapper />
-          <main>{children}</main>
+          <main>
+            {children}
+            <Toaster
+              position="top-right"
+              reverseOrder={false}
+            />
+          </main>
         </Providers>
       </body>
     </html>
