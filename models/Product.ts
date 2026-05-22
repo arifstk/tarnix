@@ -49,8 +49,8 @@ const ProductSchema = new Schema<IProductDoc>(
     status: { type: String, enum: ["active", "draft"], default: "active" },
     tags: { type: [String], default: [] },
     sku: { type: String, default: "" },
-    rating: { type: Number, default: 0, min: 0, max: 5 },
-    ratingCount: { type: Number, default: 0, min: 0 },
+    rating: { type: Number, default: 0, min: 0, max: 5, get: (v:number) => v ?? 0 },
+    ratingCount: { type: Number, default: 0, min: 0, get: (v: number) => v ?? 0 },
   },
   { timestamps: true },
 );
@@ -62,7 +62,7 @@ ProductSchema.virtual("cloudinaryId").get(function () {
   return this.images[0]?.cloudinaryId ?? "";
 });
 
-// Keep virtuals when calling .lean() or .toJSON()
+
 ProductSchema.set("toJSON", { virtuals: true });
 ProductSchema.set("toObject", { virtuals: true });
 
@@ -79,21 +79,7 @@ ProductSchema.pre(["findOneAndUpdate", "updateOne"], async function () {
   const update = this.getUpdate() as Partial<IProductDoc> & {
     $set?: Partial<IProductDoc>;
   };
-  // const data = update.$set ?? update;
-  // const price        = data.price        as number | undefined;
-  // const discountRate = data.discountRate as number | undefined;
 
-  // if (price !== undefined || discountRate !== undefined) {
-  //   const p  = price        ?? 0;
-  //   const dr = discountRate ?? 0;
-  //   const discountedPrice =
-  //     dr > 0 ? parseFloat((p * (1 - dr / 100)).toFixed(2)) : p;
-
-  //   if (update.$set) {
-  //     update.$set.discountedPrice = discountedPrice;
-  //   } else {
-  //     (update as any).discountedPrice = discountedPrice;
-  //   }
   const data = update.$set ?? update;
   const price = data.price as number | undefined;
   const discountRate = data.discountRate as number | undefined;

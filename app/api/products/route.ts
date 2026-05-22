@@ -16,46 +16,26 @@ export async function GET() {
   return NextResponse.json(products);
 }
 
-// export async function POST(req: Request) {
-//   const session = await getServerSession(authOptions);
-//   if ((session?.user as any)?.role !== "admin")
-//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+// app/api/products/route.ts
 
-//   const {
-//     name, description, price, discountRate = 0,
-//     stock = 0, category, status = "active",
-//     tags = [], sku = "", imageBase64,
-//   } = await req.json();
-
-//   if (!name || !description || price == null || !category || !imageBase64)
-//     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-
-//   await connectDB();
-//   const { url, publicId } = await uploadImage(imageBase64);
-
-//   const product = await Product.create({
-//     name, description, price, discountRate,
-//     stock, category, status, tags, sku,
-//     imageUrl: url, cloudinaryId: publicId,
-//   });
-
-//   return NextResponse.json(product, { status: 201 });
-// }
-
-
-// CHANGELOG: imageBase64 → imagesBase64[]; store as images array
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if ((session?.user as any)?.role !== "admin")
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const body = await req.json();
   const {
     name, description, price, discountRate = 0,
     stock = 0, category, status = "active",
     tags = [], sku = "",
-    imagesBase64 = [],          // CHANGELOG: array instead of single string
-    rating = 0, ratingCount = 0,
-  } = await req.json();
+    imagesBase64 = [],          
+  } = body;
+
+  // ── CHANGELOG: FORCE HARD NUMBERS TO PREVENT BLANK STRING INJECTION ──
+  // This cleanses form state garbage like "" or "4" into absolute numbers
+  const sanitizedRating = body.rating && !isNaN(Number(body.rating)) ? Number(body.rating) : 0;
+  const sanitizedRatingCount = body.ratingCount && !isNaN(Number(body.ratingCount)) ? Number(body.ratingCount) : 0;
+  // ─────────────────────────────────────────────────────────────────────
 
   if (!name || !description || price == null || !category || !imagesBase64[0])
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -71,11 +51,13 @@ export async function POST(req: Request) {
     }
   }
 
+  // Use the sanitized numeric properties down here
   const product = await Product.create({
     name, description, price, discountRate,
     stock, category, status, tags, sku,
-    images,                     // CHANGELOG: array
-    rating, ratingCount,
+    images,                     
+    rating: sanitizedRating,       // Fixed variable
+    ratingCount: sanitizedRatingCount, // Fixed variable
   });
 
   return NextResponse.json(product, { status: 201 });
