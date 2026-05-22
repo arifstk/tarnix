@@ -60,16 +60,14 @@
 
 "use client";
 // components/admin/AdminDashboard.tsx
-// Full admin panel with collapsible sidebar.
-// Sections: Overview, Users, Products, Categories, Orders, Settings.
-// All data is mock — wire up real Redux/API calls per section.
-// Design: rich dark slate (#0b0f19) with electric indigo/violet accents.
 
 import { useState, useRef, useEffect } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, LineChart, Line, Cell,
 } from "recharts";
+import ProductsSection from "./ProductsSection";
+import CategoriesSection from "./CategoriesSection";
 
 // ─── Types ────────────────────────────────────────────────────
 type Role = "user" | "admin" | "deliveryBoy";
@@ -445,7 +443,7 @@ export default function AdminDashboard() {
           )}
 
           {/* ══ PRODUCTS ══════════════════════════════════════ */}
-          {section === "products" && (
+          {/* {section === "products" && (
             <div className="max-w-6xl space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -479,10 +477,12 @@ export default function AdminDashboard() {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
+          {section === "products" && <ProductsSection />}
+          {/* <ProductsSection /> */}
 
           {/* ══ CATEGORIES ════════════════════════════════════ */}
-          {section === "categories" && (
+          {/* {section === "categories" && (
             <div className="max-w-2xl space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -519,7 +519,8 @@ export default function AdminDashboard() {
                 </table>
               </Card>
             </div>
-          )}
+          )} */}
+          {section === "categories" && <CategoriesSection />}
 
           {/* ══ ORDERS ════════════════════════════════════════ */}
           {section === "orders" && (

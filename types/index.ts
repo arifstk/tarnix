@@ -15,6 +15,7 @@ export interface ICategory {
   _id?: string;
   name: string;
   slug: string;
+  count?: string; // populated by backend for admin 
   createdAt?: string;
 }
 
