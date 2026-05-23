@@ -1,4 +1,3 @@
-
 // components/admin/ProductsSection.tsx
 "use client";
 
@@ -16,6 +15,7 @@ import {
   IProduct,
   ProductInput,
 } from "@/store/slices/productSlice";
+import { fetchCategories } from "@/store/slices/categorySlice";
 
 // ─────────────────────────────────────────────────────────────
 // Tiny UI Atoms
@@ -916,10 +916,16 @@ export default function ProductsSection() {
     error,
   } = useSelector((s: RootState) => s.products);
 
-  const categories = useSelector(
-    (s: RootState) =>
-      (s as any).categories?.items ?? []
-  ) as { _id: string; name: string }[];
+  // const categories = useSelector(
+  //   (s: RootState) =>
+  //     (s as any).categories?.items ?? []
+  // ) as { _id: string; name: string }[];
+  const categories = useSelector((s: RootState) => {
+    const slice = (s as any).categories;
+    if (!slice || !Array.isArray(slice.items)) return [] as { _id: string; name: string }[];
+    return slice.items as { _id: string; name: string }[];
+  });
+
 
   const [search, setSearch] = useState("");
 
@@ -939,6 +945,7 @@ export default function ProductsSection() {
 
   useEffect(() => {
     dispatch(fetchProducts());
+    dispatch(fetchCategories());
   }, [dispatch]);
 
   const filtered = products.filter((p) => {
