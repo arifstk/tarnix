@@ -1,66 +1,6 @@
-// // components/admin/AdminDashboard.tsx
-// // app/admin/dashboard/page.tsx — Admin dashboard with stats cards and quick links
-
-// import { getServerSession } from "next-auth";
-// import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-// import { redirect } from "next/navigation";
-// import Link from "next/link";
-// import { connectDB } from "@/lib/db";
-// import Product from "@/models/Product";
-// import Category from "@/models/Category";
-
-// export default async function AdminDashboard() {
-//   const session = await getServerSession(authOptions);
-//   if ((session?.user as any)?.role !== "admin") redirect("/login");
-
-//   await connectDB();
-//   const [productCount, categoryCount] = await Promise.all([
-//     Product.countDocuments(),
-//     Category.countDocuments(),
-//   ]);
-
-//   const stats = [
-//     { label: "Total Products", value: productCount, href: "/admin/products", color: "indigo" },
-//     { label: "Total Categories", value: categoryCount, href: "/admin/categories", color: "violet" },
-//   ];
-
-//   return (
-//     <div className="max-w-7xl mx-auto px-4 py-10">
-//       <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
-//       <p className="text-slate-400 mb-8">Welcome back, {session?.user?.name}</p>
-
-//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-//         {stats.map((s) => (
-//           <Link
-//             key={s.label}
-//             href={s.href}
-//             className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-indigo-500 transition group"
-//           >
-//             <p className="text-slate-400 text-sm mb-2">{s.label}</p>
-//             <p className="text-4xl font-bold text-white group-hover:text-indigo-400 transition">
-//               {s.value}
-//             </p>
-//           </Link>
-//         ))}
-//       </div>
-
-//       <div className="flex gap-4">
-//         <Link href="/admin/products" className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-medium text-white transition">
-//           Manage Products
-//         </Link>
-//         <Link href="/admin/categories" className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl font-medium text-white transition">
-//           Manage Categories
-//         </Link>
-//       </div>
-//     </div>
-//   );
-// }
-
-// --------------------------------------------------
-
-"use client";
 // components/admin/AdminDashboard.tsx
 
+"use client";
 import { useState, useRef, useEffect } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -273,13 +213,22 @@ export default function AdminDashboard() {
           {sideOpen && <span className="font-black text-lg tracking-tight bg-linear-to-r from-white to-slate-400 bg-clip-text text-transparent whitespace-nowrap">Tarnix</span>}
         </div>
 
+        {/* Collapse toggle */}
+        <div className="p-3 border-t" style={{ borderColor:"rgba(255,255,255,0.05)" }}>
+          <button onClick={() => setSideOpen(v => !v)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-600 rounded-xl text-slate-500 hover:text-white hover:bg-white/20 transition-all duration-200 text-xs font-medium cursor-pointer">
+            <span className={`transition-transform duration-300 ${sideOpen ? "" : "rotate-180"}`}>◀</span>
+            {sideOpen && <span>Collapse</span>}
+          </button>
+        </div>
+
         {/* Nav */}
         <nav className="flex-1 py-4 px-2 space-y-0.5">
           {NAV.map(item => {
             const active = section === item.id;
             return (
               <button key={item.id} onClick={() => setSection(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group ${active ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/20" : "text-slate-500 hover:text-slate-200 hover:bg-white/50"}`}>
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group  cursor-pointer ${active ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/20" : "text-slate-500 hover:text-slate-200 hover:bg-white/50"}`}>
                 <span className="text-base shrink-0">{item.icon}</span>
                 {sideOpen && <span className="whitespace-nowrap">{item.label}</span>}
                 {sideOpen && active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-400" />}
@@ -287,15 +236,6 @@ export default function AdminDashboard() {
             );
           })}
         </nav>
-
-        {/* Collapse toggle */}
-        <div className="p-3 border-t" style={{ borderColor:"rgba(255,255,255,0.05)" }}>
-          <button onClick={() => setSideOpen(v => !v)}
-            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-slate-500 hover:text-white hover:bg-white/20 transition-all duration-200 text-xs font-medium">
-            <span className={`transition-transform duration-300 ${sideOpen ? "" : "rotate-180"}`}>◀</span>
-            {sideOpen && <span>Collapse</span>}
-          </button>
-        </div>
       </aside>
 
       {/* ════ MAIN CONTENT ════ */}
