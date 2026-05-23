@@ -134,8 +134,8 @@ const Modal = ({ title, onClose, children }: { title: string; onClose: () => voi
 const NAV = [
   { id:"overview",    label:"Overview",    icon:"▦"  },
   { id:"users",       label:"Users",       icon:"👥" },
-  { id:"products",    label:"Products",    icon:"📦" },
   { id:"categories",  label:"Categories",  icon:"🏷"  },
+  { id:"products",    label:"Products",    icon:"📦" },
   { id:"orders",      label:"Orders",      icon:"📋" },
   { id:"settings",    label:"Settings",    icon:"⚙"  },
 ] as const;
