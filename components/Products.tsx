@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store";
 import { fetchProducts, IProduct } from "@/store/slices/productSlice";
 import { fetchCategories } from "@/store/slices/categorySlice";
-import { addToCart } from "@/store/slices/cartSlice"; // ← import action
+import { addToCart } from "@/store/slices/cartSlice";
 import ProductCard from "@/components/ProductCard";
 
 type SortKey = "newest" | "price-asc" | "price-desc" | "rating";
@@ -40,7 +40,10 @@ export default function ProductsPage() {
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState<SortKey>("newest");
   const [currentPage, setCurrentPage] = useState(1);
-  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  // const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const cartItems = useSelector(
+    (state: RootState) => (state as any).cart?.items
+  );
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -85,6 +88,19 @@ export default function ProductsPage() {
   // ─── Add to Cart handler ───────────────────────────────────────────────────
   // Maps IProduct → CartItem shape and dispatches to the cart Redux slice.
   // Also shows a brief "Added!" flash on the button via `addedId` state.
+  // const handleAddToCart = (product: IProduct) => {
+  //   dispatch(
+  //     addToCart({
+  //       _id: product._id,
+  //       name: product.name,
+  //       price: product.price,
+  //       discountedPrice: product.discountedPrice,
+  //       image: product.images?.[0]?.url || "",
+  //       quantity: 1,
+  //     })
+  //   );
+
+
   const handleAddToCart = (product: IProduct) => {
     dispatch(
       addToCart({
@@ -96,9 +112,6 @@ export default function ProductsPage() {
         quantity: 1,
       })
     );
-
-    // Show brief visual feedback on the card
-    setAddedIds((prev) => new Set(prev).add(product._id));
   };
   // ───────────────────────────────
 
@@ -227,7 +240,9 @@ export default function ProductsPage() {
                 key={product._id}
                 product={product}
                 onAddToCart={handleAddToCart}
-                isAdded={addedIds.has(product._id)} // ← flash feedback prop
+                isAdded={cartItems.some(
+                  (item: any) => item._id === product._id
+                )}
               />
             ))}
           </div>
