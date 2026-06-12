@@ -6,13 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store";
 import { fetchProducts, IProduct } from "@/store/slices/productSlice";
 import { fetchCategories } from "@/store/slices/categorySlice";
+import { addToCart } from "@/store/slices/cartSlice"; // ← import action
 import ProductCard from "@/components/ProductCard";
 
-// ─── Types ────────────────────────────────────────────────────
-
 type SortKey = "newest" | "price-asc" | "price-desc" | "rating";
-
-// ─── Skeleton ─────────────────────────────────────────────────
 
 const SkeletonCard = () => (
   <div className="rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm animate-pulse">
@@ -25,8 +22,6 @@ const SkeletonCard = () => (
     </div>
   </div>
 );
-
-// ─── Page ─────────────────────────────────────────────────────
 
 export default function ProductsPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -44,17 +39,16 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState<SortKey>("newest");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
-  // Fetch on mount
   useEffect(() => {
     dispatch(fetchProducts());
     dispatch(fetchCategories());
   }, [dispatch]);
 
-  // Only show active products on the public page
   const activeProducts = products.filter((p) => p.status === "active");
 
-  // Filter + sort
   const filtered = activeProducts
     .filter((p) => {
       const matchSearch =
@@ -78,72 +72,68 @@ export default function ProductsPage() {
           return (b.discountedPrice || b.price) - (a.discountedPrice || a.price);
         case "rating":
           return (b.rating || 0) - (a.rating || 0);
-        case "newest":
         default:
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
     });
 
   const hasFilters = search !== "" || category !== "all";
-
-  const handleAddToCart = (product: IProduct) => {
-    console.log("Add to cart:", product._id);
-  };
-
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 12;
-
-  const paginated = filtered.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-
+  const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);
 
+  // ─── Add to Cart handler ───────────────────────────────────────────────────
+  // Maps IProduct → CartItem shape and dispatches to the cart Redux slice.
+  // Also shows a brief "Added!" flash on the button via `addedId` state.
+  const handleAddToCart = (product: IProduct) => {
+    dispatch(
+      addToCart({
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+        discountedPrice: product.discountedPrice,
+        image: product.images?.[0]?.url || "",
+        quantity: 1,
+      })
+    );
+
+    // Show brief visual feedback on the card
+    setAddedIds((prev) => new Set(prev).add(product._id));
+  };
+  // ───────────────────────────────
+
   const Pagination = () => {
-    const pages: number[] = [];
-
-    // Generate page numbers 
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i);
-    }
-
+    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
     return (
       <div className="flex items-center justify-center gap-2 mt-8">
-        {/* Prev button */}
         <button
           disabled={currentPage === 1}
           onClick={() => setCurrentPage((p) => p - 1)}
           className={`px-3 py-1 rounded-md border border-slate-200 text-sm ${currentPage === 1
-              ? "text-slate-400 cursor-not-allowed opacity-50"
-              : "text-slate-600 hover:bg-slate-100 cursor-pointer"
+            ? "text-slate-400 cursor-not-allowed opacity-50"
+            : "text-slate-600 hover:bg-slate-100 cursor-pointer"
             }`}
         >
           Prev
         </button>
-
-        {/* Page numbers */}
         {pages.map((num) => (
           <button
             key={num}
             onClick={() => setCurrentPage(num)}
             className={`px-3 py-1 rounded-md text-sm ${currentPage === num
-                ? "bg-indigo-600 text-white"
-                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer"
+              ? "bg-indigo-600 text-white"
+              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer"
               }`}
           >
             {num}
           </button>
         ))}
-
-        {/* Next button */}
         <button
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage((p) => p + 1)}
           className={`px-3 py-1 rounded-md border border-slate-200 text-sm ${currentPage === totalPages
-              ? "text-slate-400 cursor-not-allowed opacity-50"
-              : "text-slate-600 hover:bg-slate-100 cursor-pointer"
+            ? "text-slate-400 cursor-not-allowed opacity-50"
+            : "text-slate-600 hover:bg-slate-100 cursor-pointer"
             }`}
         >
           Next
@@ -152,17 +142,11 @@ export default function ProductsPage() {
     );
   };
 
-
-  // Main Content
   return (
     <main className="min-h-screen">
       <div className="max-w-7xl mx-auto px-1 pt-4 pb-10">
 
-        {/* ── Header ── */}
         <div className="mb-2">
-          {/* <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-            Products
-          </h1> */}
           <p className="text-sm text-slate-500 text-center">
             {loading
               ? "Loading…"
@@ -170,9 +154,8 @@ export default function ProductsPage() {
           </p>
         </div>
 
-        {/* ── Filter Bar ── */}
+        {/* Filter Bar */}
         <div className="flex flex-wrap gap-3 mb-8 items-center">
-          {/* Search */}
           <div className="relative flex-1 min-w-45 max-w-xs">
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
               🔍
@@ -185,7 +168,6 @@ export default function ProductsPage() {
             />
           </div>
 
-          {/* Category */}
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -193,13 +175,10 @@ export default function ProductsPage() {
           >
             <option value="all">All Categories</option>
             {categories.map((c) => (
-              <option key={c._id} value={c._id}>
-                {c.name}
-              </option>
+              <option key={c._id} value={c._id}>{c.name}</option>
             ))}
           </select>
 
-          {/* Sort */}
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
@@ -211,7 +190,6 @@ export default function ProductsPage() {
             <option value="rating">Top Rated</option>
           </select>
 
-          {/* Clear filters */}
           {hasFilters && (
             <button
               onClick={() => { setSearch(""); setCategory("all"); }}
@@ -221,7 +199,6 @@ export default function ProductsPage() {
             </button>
           )}
 
-          {/* Result count when filtered */}
           {hasFilters && !loading && (
             <span className="text-sm text-slate-400 ml-auto">
               {filtered.length} result{filtered.length !== 1 ? "s" : ""}
@@ -229,7 +206,6 @@ export default function ProductsPage() {
           )}
         </div>
 
-        {/* ── Error ── */}
         {error && (
           <div className="flex items-center gap-3 px-4 py-3 mb-8 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-600 font-medium">
             <span>⚠</span>
@@ -237,16 +213,13 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {/* ── Loading Skeletons ── */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
+            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         )}
 
-        {/* ── Product Grid ── */}
+        {/* Product Grid — passes addedId so card can show "Added!" flash */}
         {!loading && filtered.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-5">
             {paginated.map((product) => (
@@ -254,20 +227,17 @@ export default function ProductsPage() {
                 key={product._id}
                 product={product}
                 onAddToCart={handleAddToCart}
+                isAdded={addedIds.has(product._id)} // ← flash feedback prop
               />
             ))}
           </div>
         )}
 
-        {/* Render Pagination */}
         {!loading && totalPages > 1 && <Pagination />}
 
-        {/* ── Empty State ── */}
         {!loading && filtered.length === 0 && !error && (
           <div className="py-24 text-center">
-            <div className="text-6xl mb-4">
-              {hasFilters ? "🔍" : "📦"}
-            </div>
+            <div className="text-6xl mb-4">{hasFilters ? "🔍" : "📦"}</div>
             <h3 className="text-lg font-bold text-slate-700 mb-2">
               {hasFilters ? "No products match your filters" : "No products available"}
             </h3>
@@ -291,4 +261,3 @@ export default function ProductsPage() {
     </main>
   );
 }
-

@@ -8,6 +8,9 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import UserNav from "./UserNav";
 import MobileNav from "./MobileNav";
+import { ShoppingCart } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 type NavbarProps = {
   role: "user" | "admin" | "deliveryBoy" | null;
@@ -18,11 +21,15 @@ const Header = ({ role }: NavbarProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isAdmin = role === "admin";
-  const isDeliveryBoy= role === "deliveryBoy";
+  const isDeliveryBoy = role === "deliveryBoy";
+
+  const cartCount = useSelector((s: RootState) =>
+  s.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+);
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md shadow-[0_1px_30px_rgba(0,0,0,0.4)] border-b border-white/20">
-      <div className="w-[95%] md:w-[90%] mx-auto px-1 h-16 flex items-center justify-between gap-4">
+      <div className="w-[95%] md:w-[90%] mx-auto px-1 py-2 flex items-center justify-between gap-4">
 
         {/* Logo + Mobile hamburger */}
         <div className="flex items-center md:hidden gap-3">
@@ -63,7 +70,7 @@ const Header = ({ role }: NavbarProps) => {
           {isAdmin && (
             <Link
               href="/admin/dashboard"
-              className=" flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-700 text-xs font-semibold hover:bg-violet-600/30 transition-all duration-200"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-700 text-xs font-semibold hover:bg-violet-600/30 transition-all duration-200"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25A2.25 2.25 0 0113.5 8.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
@@ -76,7 +83,7 @@ const Header = ({ role }: NavbarProps) => {
           {isDeliveryBoy && (
             <Link
               href="/delivery/dashboard"
-              className=" flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600/20 border border-green-500/30 text-green-700 text-xs font-semibold hover:bg-green-600/30 transition-all duration-200"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600/20 border border-green-500/30 text-green-700 text-xs font-semibold hover:bg-green-600/30 transition-all duration-200"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25A2.25 2.25 0 0113.5 8.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
@@ -84,6 +91,18 @@ const Header = ({ role }: NavbarProps) => {
               Dashboard
             </Link>
           )}
+
+          {/* Cart Icon */}
+          <Link
+            href="/cart"
+            className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-200"
+          >
+            <ShoppingCart className="w-5 h-5 text-indigo-600" />
+            {/* Badge for item count */}
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          </Link>
 
           {session?.user ? (
             <div className="relative" ref={dropdownRef}>
