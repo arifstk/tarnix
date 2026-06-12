@@ -21,7 +21,7 @@ const Header = ({ role }: NavbarProps) => {
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md shadow-[0_1px_30px_rgba(0,0,0,0.4)] border-b border-white/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div className="w-[95%] md:w-[90%] mx-auto px-1 h-16 flex items-center justify-between gap-4">
 
         {/* Logo + Mobile hamburger */}
         <div className="flex items-center md:hidden gap-3">
