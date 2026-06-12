@@ -71,8 +71,50 @@ const MobileNav = ({ role }: MobileNavProps) => {
         {/* Nav links — dynamically scrollable main panel */}
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
 
+          <>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider px-3 pb-2">Menu</p>
+            {USER_NAV_LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${active
+                    ? "bg-indigo-50 text-indigo-600 font-semibold"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
+                >
+                  {link.label}
+                  {link.label === "Hot Deals" && (
+                    <span className="ml-auto text-[10px] font-bold bg-rose-500 text-white px-2 py-0.5 rounded-full animate-pulse">HOT</span>
+                  )}
+                </Link>
+              );
+            })}
+
+            <div className="border-t border-slate-100 my-4" />
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider px-3 pb-2">Account</p>
+            <Link href="/profile" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150">
+              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              My Profile
+            </Link>
+            {
+              role === "user" && (
+                <Link href="/orders" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150">
+                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+                  </svg>
+                  My Orders
+                </Link>
+              )
+            }
+          </>
+
           {/* User links */}
-          {role === "user" && (
+          {/* {role === "user" && (
             <>
               <p className="text-xs text-slate-400 font-bold uppercase tracking-wider px-3 pb-2">Menu</p>
               {USER_NAV_LINKS.map((link) => {
@@ -110,10 +152,10 @@ const MobileNav = ({ role }: MobileNavProps) => {
                 My Orders
               </Link>
             </>
-          )}
+          )} */}
 
           {/* Admin links */}
-          {role === "admin" && (
+          {/* {role === "admin" && (
             <>
               <p className="text-xs text-slate-400 font-bold uppercase tracking-wider px-3 pb-2">Admin</p>
               <Link href="/admin/dashboard" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-violet-600 bg-violet-50 font-medium transition-all duration-150">
@@ -147,10 +189,10 @@ const MobileNav = ({ role }: MobileNavProps) => {
                 Manage Orders
               </Link>
             </>
-          )}
+          )} */}
 
           {/* Delivery Boy links */}
-          {role === "deliveryBoy" && (
+          {/* {role === "deliveryBoy" && (
             <>
               <p className="text-xs text-slate-400 font-bold uppercase tracking-wider px-3 pb-2">Delivery</p>
               <Link href="/delivery" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150">
@@ -166,14 +208,14 @@ const MobileNav = ({ role }: MobileNavProps) => {
                 Delivery History
               </Link>
             </>
-          )}
+          )} */}
 
           {/* Not logged in */}
-          {!role && (
+          {/* {!role && (
             <Link href="/login" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-all duration-150">
               Sign In
             </Link>
-          )}
+          )} */}
         </nav>
 
         {/* Sign out — Anchored to bottom footer */}
