@@ -41,9 +41,9 @@ export default function ProductsPage() {
     return slice.items as { _id: string; name: string }[];
   });
 
-  const [search, setSearch]     = useState("");
+  const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
-  const [sort, setSort]         = useState<SortKey>("newest");
+  const [sort, setSort] = useState<SortKey>("newest");
 
   // Fetch on mount
   useEffect(() => {
@@ -87,11 +87,73 @@ export default function ProductsPage() {
   const hasFilters = search !== "" || category !== "all";
 
   const handleAddToCart = (product: IProduct) => {
-    // TODO: wire up your cart slice or context here
-    // e.g. dispatch(addToCart(product))
     console.log("Add to cart:", product._id);
   };
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
+
+  const paginated = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
+
+  const Pagination = () => {
+    const pages: number[] = [];
+
+    // Generate page numbers 
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-8">
+        {/* Prev button */}
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => p - 1)}
+          className={`px-3 py-1 rounded-md border border-slate-200 text-sm ${currentPage === 1
+              ? "text-slate-400 cursor-not-allowed opacity-50"
+              : "text-slate-600 hover:bg-slate-100 cursor-pointer"
+            }`}
+        >
+          Prev
+        </button>
+
+        {/* Page numbers */}
+        {pages.map((num) => (
+          <button
+            key={num}
+            onClick={() => setCurrentPage(num)}
+            className={`px-3 py-1 rounded-md text-sm ${currentPage === num
+                ? "bg-indigo-600 text-white"
+                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer"
+              }`}
+          >
+            {num}
+          </button>
+        ))}
+
+        {/* Next button */}
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => p + 1)}
+          className={`px-3 py-1 rounded-md border border-slate-200 text-sm ${currentPage === totalPages
+              ? "text-slate-400 cursor-not-allowed opacity-50"
+              : "text-slate-600 hover:bg-slate-100 cursor-pointer"
+            }`}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
+
+  // Main Content
   return (
     <main className="min-h-screen">
       <div className="max-w-7xl mx-auto px-1 pt-4 pb-10">
@@ -186,8 +248,8 @@ export default function ProductsPage() {
 
         {/* ── Product Grid ── */}
         {!loading && filtered.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {filtered.map((product) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-5">
+            {paginated.map((product) => (
               <ProductCard
                 key={product._id}
                 product={product}
@@ -196,6 +258,9 @@ export default function ProductsPage() {
             ))}
           </div>
         )}
+
+        {/* Render Pagination */}
+        {!loading && totalPages > 1 && <Pagination />}
 
         {/* ── Empty State ── */}
         {!loading && filtered.length === 0 && !error && (
@@ -226,3 +291,4 @@ export default function ProductsPage() {
     </main>
   );
 }
+
