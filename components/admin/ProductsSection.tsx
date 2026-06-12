@@ -173,36 +173,7 @@ const Modal = ({
   </div>
 );
 
-// ─────────────────────────────────────────────────────────────
-// Star Rating
-// ─────────────────────────────────────────────────────────────
-// const StarRating = ({
-//   value,
-//   onChange,
-//   readonly = false,
-// }: {
-//   value: number;
-//   onChange?: (v: number) => void;
-//   readonly?: boolean;
-// }) => (
-//   <div className="flex gap-0.5">
-//     {[1, 2, 3, 4, 5].map((star) => (
-//       <button
-//         key={star}
-//         type="button"
-//         disabled={readonly}
-//         onClick={() => onChange?.(star)}
-//         className={`text-xl transition-transform ${readonly
-//           ? "cursor-default"
-//           : "hover:scale-125 cursor-pointer"
-//           } ${star <= value ? "text-amber-400" : "text-slate-700"}`}
-//       >
-//         ★
-//       </button>
-//     ))}
-//   </div>
-// );
-
+// Star Rating ===========================
 const StarRating = ({
   value,
   onChange,

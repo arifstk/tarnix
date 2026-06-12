@@ -1,11 +1,16 @@
 import Hero from '@/components/Hero'
+import Products from '@/components/Products'
 import React from 'react'
 
 const Home = () => {
   return (
     <div>
       <Hero />
-      
+      {/* fetch products from DB */}
+      <h2 className='text-4xl text-gray-800 font-bold pt-15 text-center'>Featured Products</h2>
+      <div>
+        <Products />
+      </div>
     </div>
   )
 }
