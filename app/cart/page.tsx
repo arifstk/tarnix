@@ -140,12 +140,15 @@ export default function CartPage() {
                 <span>${total.toFixed(2)}</span>
               </div>
 
-              <button className="w-full py-2.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
-                Checkout
-              </button>
+              <Link href="/checkout">
+                <button className="w-full py-2.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors cursor-pointer">
+                  Checkout
+                </button>
+              </Link>
+
               <button
                 onClick={() => dispatch(clearCart())}
-                className="w-full mt-3 py-2.5 rounded-lg bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition-colors"
+                className="w-full mt-3 py-2.5 rounded-lg bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition-colors cursor-pointer"
               >
                 Clear Cart
               </button>
