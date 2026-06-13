@@ -8,6 +8,7 @@ import {
 } from "recharts";
 import ProductsSection from "./ProductsSection";
 import CategoriesSection from "./CategoriesSection";
+import OrdersSection from "./OrdersSection";
 
 // ─── Types ────────────────────────────────────────────────────
 type Role = "user" | "admin" | "deliveryBoy";
@@ -463,7 +464,7 @@ export default function AdminDashboard() {
           {section === "categories" && <CategoriesSection />}
 
           {/* ══ ORDERS ════════════════════════════════════════ */}
-          {section === "orders" && (
+          {/* {section === "orders" && (
             <div className="max-w-6xl space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -473,7 +474,7 @@ export default function AdminDashboard() {
                 <input value={orderSearch} onChange={e => setOrderSearch(e.target.value)} placeholder="Search order or customer…"
                   className="px-3.5 py-2 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 w-64" />
               </div>
-              {/* Status chips summary */}
+              
               <div className="flex flex-wrap gap-2">
                 {(["pending","processing","shipped","delivered","cancelled"] as OrderStatus[]).map(s => (
                   <span key={s} className={`text-xs font-semibold px-3 py-1.5 rounded-full ${orderColors[s]}`}>
@@ -508,7 +509,8 @@ export default function AdminDashboard() {
                 </div>
               </Card>
             </div>
-          )}
+          )} */}
+          {section === "orders" && (<OrdersSection />)} 
 
           {/* ══ SETTINGS ══════════════════════════════════════ */}
           {section === "settings" && (
