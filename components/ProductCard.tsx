@@ -94,6 +94,7 @@
 "use client";
 import Image from "next/image";
 import { IProduct } from "@/store/slices/productSlice";
+import Link from "next/link";
 
 interface Props {
   product: IProduct;
@@ -112,18 +113,20 @@ export default function ProductCard({ product, onAddToCart, isAdded }: Props) {
     <div className="rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col">
       {/* Image */}
       <div className="relative aspect-4/3 bg-slate-100">
-        {imageSrc ? (
-          <Image
-            src={imageSrc}
-            alt={product.name}
-            fill
-            className={`object-cover ${isOutOfStock ? "opacity-50" : ""}`}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-300 text-4xl">
-            📦
-          </div>
-        )}
+        <Link href={`/products/${product._id}`}>
+          {imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={product.name}
+              fill
+              className={`object-cover ${isOutOfStock ? "opacity-50" : ""}`}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-slate-300 text-4xl">
+              📦
+            </div>
+          )}
+        </Link>
 
         {/* Discount badge */}
         {hasDiscount && (
@@ -169,18 +172,18 @@ export default function ProductCard({ product, onAddToCart, isAdded }: Props) {
         <div className="flex items-center gap-1.5 mt-1">
           <div
             className={`w-1.5 h-1.5 rounded-full shrink-0 ${isOutOfStock
-                ? "bg-rose-500"
-                : isLowStock
-                  ? "bg-amber-400"
-                  : "bg-emerald-500"
+              ? "bg-rose-500"
+              : isLowStock
+                ? "bg-amber-400"
+                : "bg-emerald-500"
               }`}
           />
           <span
             className={`text-xs font-medium ${isOutOfStock
-                ? "text-rose-500"
-                : isLowStock
-                  ? "text-amber-500"
-                  : "text-slate-400"
+              ? "text-rose-500"
+              : isLowStock
+                ? "text-amber-500"
+                : "text-slate-400"
               }`}
           >
             {isOutOfStock
@@ -205,13 +208,13 @@ export default function ProductCard({ product, onAddToCart, isAdded }: Props) {
 
         {/* Add to Cart button */}
         <button
-          onClick={() => !isOutOfStock && onAddToCart(product)}
+          onClick={(e) => {!isOutOfStock && onAddToCart(product); e.stopPropagation(); e.preventDefault()}}
           disabled={isOutOfStock}
           className={`mt-2 w-full py-2 rounded-xl text-sm font-semibold active:scale-95 transition-all ${isOutOfStock
-              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-              : isAdded
-                ? "bg-emerald-500 text-white"
-                : "bg-indigo-600 text-white hover:bg-indigo-500"
+            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+            : isAdded
+              ? "bg-emerald-500 text-white"
+              : "bg-indigo-600 text-white hover:bg-indigo-500"
             }`}
         >
           {isOutOfStock ? "Out of Stock" : isAdded ? "✓ Added!" : "Add to Cart"}
