@@ -1,5 +1,4 @@
 // components/ProductDetailClient.tsx
-// CHANGELOG: Client component — image gallery, add to cart, reviews section
 
 "use client";
 import { useState } from "react";
