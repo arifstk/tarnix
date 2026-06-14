@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import HeaderWrapper from "@/components/HeaderWrapper";
 import { Toaster } from "react-hot-toast";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Tarnix",
@@ -29,6 +30,7 @@ export default function RootLayout({
               reverseOrder={false}
             />
           </main>
+          <Footer />
         </Providers>
       </body>
     </html>

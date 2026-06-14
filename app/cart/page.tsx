@@ -42,7 +42,7 @@ export default function CartPage() {
               Browse products and add them to your cart.
             </p>
             <Link
-              href="/products"
+              href="/shop"
               className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-500 transition-colors"
             >
               Continue Shopping

@@ -1,12 +1,14 @@
 // components/ProductDetailClient.tsx
 
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // <-- Imported useSelector
 import { addToCart } from "@/store/slices/cartSlice";
 import toast from "react-hot-toast";
+import SimilarProducts from "./SimilarProducts";
+import RecentlyViewed from "./RecentlyViewed";
 
 // ─── Types ────────────────────────────────────────────────────
 interface ProductImage {
@@ -45,7 +47,7 @@ interface Props {
   reviews: Review[];
 }
 
-// ─── Helpers ─────────────────────────────────────────────────
+// ─── Helpers 
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -76,7 +78,7 @@ function formatDate(iso: string) {
   });
 }
 
-// ─── Star display ─────────────────────────────────────────────
+// ─── Star display 
 function Stars({
   rating,
   size = "sm",
@@ -101,7 +103,7 @@ function Stars({
   );
 }
 
-// ─── Rating bar breakdown ─────────────────────────────────────
+// ─── Rating bar breakdown 
 function RatingBar({
   star,
   count,
@@ -127,13 +129,15 @@ function RatingBar({
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
+// Main ═══════════════════════════════════════════════════════════════
 export default function ProductDetailClient({ product, reviews }: Props) {
   const dispatch = useDispatch();
 
+  const cartItems = useSelector((state: any) => state.cart.items || []);
+  const isAdded = cartItems.some((item: any) => item._id === product._id);
+
   const [activeImg, setActiveImg] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
   const [imgError, setImgError] = useState<Record<number, boolean>>({});
 
   const images = product.images || [];
@@ -154,6 +158,8 @@ export default function ProductDetailClient({ product, reviews }: Props) {
 
   // ── Add to cart ──
   const handleAddToCart = () => {
+    if (isAdded) return; // Guard clause to prevent extra firing
+
     dispatch(
       addToCart({
         _id: product._id,
@@ -164,10 +170,46 @@ export default function ProductDetailClient({ product, reviews }: Props) {
         quantity,
       })
     );
-    setAddedToCart(true);
     toast.success("Added to cart!");
-    setTimeout(() => setAddedToCart(false), 2000);
   };
+
+  // Similar products 
+  const handleGenericAddToCart = (prod: any) => {
+    dispatch(
+      addToCart({
+        _id: prod._id,
+        name: prod.name,
+        price: prod.price,
+        discountedPrice: prod.discountedPrice,
+        image: prod.images?.[0]?.url || "",
+        quantity: 1, // Default to single unit additions from lists
+      })
+    );
+    toast.success(`${prod.name} added to cart!`);
+  };
+
+  // Recently Viewed products
+  useEffect(() => {
+    if (!product?._id) return;
+
+    const existingHistory = localStorage.getItem("recentlyViewed");
+    let historyArr: string[] = [];
+
+    if (existingHistory) {
+      try {
+        historyArr = JSON.parse(existingHistory);
+      } catch (e) {
+        historyArr = [];
+      }
+    }
+
+    historyArr = historyArr.filter((id) => id !== product._id);
+    historyArr.unshift(product._id);
+
+    if (historyArr.length > 10) historyArr.pop();
+
+    localStorage.setItem("recentlyViewed", JSON.stringify(historyArr));
+  }, [product._id]);
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -252,8 +294,8 @@ export default function ProductDetailClient({ product, reviews }: Props) {
                     key={idx}
                     onClick={() => setActiveImg(idx)}
                     className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${activeImg === idx
-                        ? "border-indigo-500 shadow-md shadow-indigo-100"
-                        : "border-transparent hover:border-slate-300"
+                      ? "border-indigo-500 shadow-md shadow-indigo-100"
+                      : "border-transparent hover:border-slate-300"
                       }`}
                   >
                     {!imgError[idx] ? (
@@ -285,8 +327,8 @@ export default function ProductDetailClient({ product, reviews }: Props) {
                 </span>
               )}
               <span className={`text-xs font-bold px-3 py-1 rounded-full border ${product.status === "active"
-                  ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                  : "bg-slate-100 text-slate-500 border-slate-200"
+                ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                : "bg-slate-100 text-slate-500 border-slate-200"
                 }`}>
                 {product.status === "active" ? "In Store" : "Draft"}
               </span>
@@ -374,13 +416,14 @@ export default function ProductDetailClient({ product, reviews }: Props) {
 
             {/* Quantity + Add to cart */}
             <div className="space-y-3">
-              {/* Quantity */}
+              {/* Quantity Selector */}
               <div className="flex items-center gap-3">
                 <span className="text-sm font-semibold text-slate-600">Quantity</span>
                 <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold transition-colors"
+                    disabled={isAdded || !inStock} // Disable adjustment if already added
+                    className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     −
                   </button>
@@ -388,10 +431,9 @@ export default function ProductDetailClient({ product, reviews }: Props) {
                     {quantity}
                   </span>
                   <button
-                    onClick={() =>
-                      setQuantity((q) => Math.min(product.stock, q + 1))
-                    }
-                    className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold transition-colors"
+                    onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                    disabled={isAdded || !inStock} // Disable adjustment if already added
+                    className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     +
                   </button>
@@ -402,15 +444,15 @@ export default function ProductDetailClient({ product, reviews }: Props) {
               <div className="flex gap-3">
                 <button
                   onClick={handleAddToCart}
-                  disabled={!inStock || addedToCart}
-                  className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-all active:scale-95 disabled:cursor-not-allowed ${addedToCart
-                      ? "bg-emerald-500 text-white"
-                      : inStock
-                        ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-200"
-                        : "bg-slate-200 text-slate-400"
+                  disabled={!inStock || isAdded} // <-- Disables for out of stock OR already added
+                  className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-all active:scale-95 disabled:cursor-not-allowed ${isAdded
+                    ? "bg-emerald-500 text-white" // <-- Styled identically to ProductCard's added state
+                    : inStock
+                      ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-200"
+                      : "bg-slate-200 text-slate-400"
                     }`}
                 >
-                  {addedToCart ? "✓ Added to Cart!" : inStock ? "Add to Cart 🛒" : "Out of Stock"}
+                  {isAdded ? "✓ Added to Cart!" : inStock ? "Add to Cart 🛒" : "Out of Stock"}
                 </button>
 
                 <Link
@@ -443,110 +485,79 @@ export default function ProductDetailClient({ product, reviews }: Props) {
         </div>
       </div>
 
-      {/* ════ REVIEWS SECTION ════ */}
-      <div className="max-w-6xl mx-auto px-4 py-10">
+      {/* ── REVIEWS SECTION ── */}
+      <div className="px-4 py-10">
         <div className="h-px bg-slate-200 mb-10" />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-
-          {/* ── Rating summary sidebar ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <div className="space-y-5">
-            <h2 className="text-xl font-black text-slate-800">
-              Customer Reviews
-            </h2>
-
+            <h2 className="text-xl font-black text-slate-800">Customer Reviews</h2>
             {reviews.length === 0 ? (
               <div className="p-6 rounded-2xl bg-white border border-slate-100 text-center">
                 <div className="text-4xl mb-3">💬</div>
                 <p className="text-sm font-semibold text-slate-600">No reviews yet</p>
-                <p className="text-xs text-slate-400 mt-1">
-                  Be the first to review this product after purchase.
-                </p>
+                <p className="text-xs text-slate-400 mt-1">Be the first to review this product after purchase.</p>
               </div>
             ) : (
               <div className="p-5 rounded-2xl bg-white border border-slate-100 shadow-sm space-y-4">
-                {/* Overall */}
                 <div className="text-center pb-4 border-b border-slate-100">
-                  <p className="text-5xl font-black text-slate-800">
-                    {product.rating > 0 ? product.rating.toFixed(1) : "—"}
-                  </p>
+                  <p className="text-5xl font-black text-slate-800">{product.rating > 0 ? product.rating.toFixed(1) : "—"}</p>
                   <Stars rating={product.rating} size="lg" />
-                  <p className="text-xs text-slate-400 mt-1">
-                    Based on {reviews.length} review{reviews.length !== 1 ? "s" : ""}
-                  </p>
+                  <p className="text-xs text-slate-400 mt-1">Based on {reviews.length} review{reviews.length !== 1 ? "s" : ""}</p>
                 </div>
-
-                {/* Breakdown */}
                 <div className="space-y-2">
                   {ratingBreakdown.map(({ star, count }) => (
-                    <RatingBar
-                      key={star}
-                      star={star}
-                      count={count}
-                      total={reviews.length}
-                    />
+                    <RatingBar key={star} star={star} count={count} total={reviews.length} />
                   ))}
                 </div>
               </div>
             )}
           </div>
-
-          {/* ── Review list ── */}
           <div className="lg:col-span-2 space-y-4">
-            {reviews.length === 0 ? (
-              <div className="hidden lg:block" />
-            ) : (
-              reviews.map((review, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-3"
-                >
-                  {/* Reviewer header */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      {/* Avatar */}
-                      <div className={`w-10 h-10 rounded-full bg-linear-to-br ${getAvatarColor(review.reviewer)} flex items-center justify-center text-white text-sm font-black shrink-0`}>
-                        {getInitials(review.reviewer)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-800">
-                          {review.reviewer}
-                        </p>
-                        <p className="text-xs text-slate-400">
-                          {formatDate(review.submittedAt)}
-                        </p>
-                      </div>
+            {reviews.length !== 0 && reviews.map((review, idx) => (
+              <div key={idx} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full bg-linear-to-br ${getAvatarColor(review.reviewer)} flex items-center justify-center text-white text-sm font-black shrink-0`}>
+                      {getInitials(review.reviewer)}
                     </div>
-
-                    {/* Verified badge */}
-                    <div className="flex items-center gap-1 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full shrink-0">
-                      <span className="text-emerald-500 text-xs">✓</span>
-                      <span className="text-xs font-semibold text-emerald-600">
-                        Verified Purchase
-                      </span>
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">{review.reviewer}</p>
+                      <p className="text-xs text-slate-400">{formatDate(review.submittedAt)}</p>
                     </div>
                   </div>
-
-                  {/* Stars */}
-                  <Stars rating={review.rating} size="sm" />
-
-                  {/* Comment */}
-                  {review.comment ? (
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      {review.comment}
-                    </p>
-                  ) : (
-                    <p className="text-sm text-slate-400 italic">
-                      No written review.
-                    </p>
-                  )}
+                  <div className="flex items-center gap-1 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full shrink-0">
+                    <span className="text-emerald-500 text-xs">✓</span>
+                    <span className="text-xs font-semibold text-emerald-600">Verified Purchase</span>
+                  </div>
                 </div>
-              ))
-            )}
+                <Stars rating={review.rating} size="sm" />
+                <p className="text-sm text-slate-600 leading-relaxed">{review.comment || "No written review."}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
+      {/* ════ SIMILAR PRODUCTS AT THE VERY BOTTOM ════ */}
+      <div>
+        {category && (
+          <SimilarProducts
+            currentProductId={product._id}
+            category={category}
+            onAddToCart={handleGenericAddToCart}
+            cartItems={cartItems}
+          />
+        )}
+      </div>
+
+      {/* =======RECENTLY VIEWED PRODUCTS SECTION ════ */}
+      <div>
+        <RecentlyViewed
+          currentProductId={product._id}
+          onAddToCart={handleGenericAddToCart}
+          cartItems={cartItems}
+        />
+      </div>
     </main>
   );
 }

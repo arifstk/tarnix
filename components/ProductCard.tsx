@@ -118,12 +118,12 @@ export default function ProductCard({ product, onAddToCart, isAdded }: Props) {
         {/* Add to Cart button */}
         <button
           onClick={(e) => {!isOutOfStock && onAddToCart(product); e.stopPropagation(); e.preventDefault()}}
-          disabled={isOutOfStock}
+          disabled={isOutOfStock || isAdded}
           className={`mt-2 w-full py-2 rounded-xl text-sm font-semibold active:scale-95 transition-all ${isOutOfStock
             ? "bg-slate-100 text-slate-400 cursor-not-allowed"
             : isAdded
-              ? "bg-emerald-500 text-white"
-              : "bg-indigo-600 text-white hover:bg-indigo-500"
+              ? "bg-emerald-500 text-white cursor-not-allowed"
+              : "bg-indigo-600 text-white hover:bg-indigo-500 cursor-pointer"
             }`}
         >
           {isOutOfStock ? "Out of Stock" : isAdded ? "✓ Added!" : "Add to Cart"}
