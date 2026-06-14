@@ -150,7 +150,7 @@ const Header = ({ role }: NavbarProps) => {
                     {role === "user" && (
                       <>
 
-                        <Link href="/orders" className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-white/[0.07] transition-all duration-150" onClick={() => setDropdownOpen(false)}>
+                        <Link href="/my-orders" className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-white/[0.07] transition-all duration-150" onClick={() => setDropdownOpen(false)}>
                           My Orders
                         </Link>
                       </>

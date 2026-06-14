@@ -3,13 +3,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Order from "@/models/Order";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
   try {
     await dbConnect();
     const body = await req.json();
+    const session = await getServerSession(authOptions);
 
     const order = await Order.create({
+      userEmail: session?.user?.email || null,
       items: body.items,
       shippingAddress: body.shippingAddress,
       paymentMethod: body.paymentMethod,
