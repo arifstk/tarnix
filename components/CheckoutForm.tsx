@@ -334,11 +334,13 @@ import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { clearCart, CartItem } from "@/store/slices/cartSlice";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
 
 interface Props {
   cart: CartItem[];
   subtotal: number;
-  clientSecret: string; // ← received from page, already passed to Elements
+  clientSecret: string;
+  deliveryCharge: number;
 }
 
 type PaymentMethod = "cod" | "stripe";
@@ -352,6 +354,8 @@ export default function CheckoutForm({ cart, subtotal, clientSecret }: Props) {
   const stripe = useStripe();
   const elements = useElements();
 
+  const { deliveryCharge } = useDeliveryCharge();
+
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [loading, setLoading] = useState(false);
 
@@ -364,7 +368,7 @@ export default function CheckoutForm({ cart, subtotal, clientSecret }: Props) {
     country: "",
   });
 
-  const total = subtotal;
+  const total = subtotal + deliveryCharge;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -486,9 +490,8 @@ export default function CheckoutForm({ cart, subtotal, clientSecret }: Props) {
           <div className="grid grid-cols-2 gap-3 mb-5">
             <button
               onClick={() => setPaymentMethod("cod")}
-              className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${
-                paymentMethod === "cod" ? "border-indigo-500 bg-indigo-50" : "border-slate-200 hover:border-slate-300"
-              }`}
+              className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${paymentMethod === "cod" ? "border-indigo-500 bg-indigo-50" : "border-slate-200 hover:border-slate-300"
+                }`}
             >
               <span className="text-2xl">💵</span>
               <div>
@@ -499,9 +502,8 @@ export default function CheckoutForm({ cart, subtotal, clientSecret }: Props) {
 
             <button
               onClick={() => setPaymentMethod("stripe")}
-              className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${
-                paymentMethod === "stripe" ? "border-indigo-500 bg-indigo-50" : "border-slate-200 hover:border-slate-300"
-              }`}
+              className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${paymentMethod === "stripe" ? "border-indigo-500 bg-indigo-50" : "border-slate-200 hover:border-slate-300"
+                }`}
             >
               <span className="text-2xl">💳</span>
               <div>
@@ -558,7 +560,9 @@ export default function CheckoutForm({ cart, subtotal, clientSecret }: Props) {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Shipping</span>
-              <span className="font-semibold text-emerald-600">Free</span>
+              <span className={`font-semibold ${deliveryCharge === 0 ? "text-emerald-600" : "text-slate-700"}`}>
+                {deliveryCharge === 0 ? "Free" : `$${deliveryCharge.toFixed(2)}`}
+              </span>
             </div>
             <div className="flex justify-between text-base font-bold text-slate-800 pt-2 border-t border-slate-100">
               <span>Total</span>

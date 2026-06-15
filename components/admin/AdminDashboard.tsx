@@ -15,45 +15,26 @@ type Role = "user" | "admin" | "deliveryBoy";
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 type Section = "overview" | "users" | "products" | "categories" | "orders" | "settings";
 
-interface User   { id: string; name: string; email: string; role: Role;   joined: string; avatar: string; orders: number; }
-interface Product{ id: string; name: string; category: string; price: number; stock: number; image: string; status: "active"|"draft"; }
-interface Category{ id: string; name: string; slug: string; count: number; }
-interface Order  { id: string; customer: string; items: number; total: string; status: OrderStatus; date: string; }
+interface User { id: string; name: string; email: string; role: Role; joined: string; avatar: string; orders: number; }
+interface Product { id: string; name: string; category: string; price: number; stock: number; image: string; status: "active" | "draft"; }
+interface Category { id: string; name: string; slug: string; count: number; }
+interface Order { id: string; customer: string; items: number; total: string; status: OrderStatus; date: string; }
 
 // ─── Mock Data ────────────────────────────────────────────────
 const MOCK_USERS: User[] = [
-  { id: "U001", name: "Rafi Hossain",   email: "rafi@email.com",   role: "user",        joined: "Jan 2024", avatar: "RH", orders: 12 },
-  { id: "U002", name: "Nadia Islam",    email: "nadia@email.com",  role: "admin",       joined: "Feb 2023", avatar: "NI", orders: 3  },
-  { id: "U003", name: "Karim Uddin",    email: "karim@email.com",  role: "deliveryBoy", joined: "Mar 2024", avatar: "KU", orders: 0  },
-  { id: "U004", name: "Sumaiya Begum",  email: "suma@email.com",   role: "user",        joined: "Apr 2024", avatar: "SB", orders: 7  },
-  { id: "U005", name: "Tanvir Ahmed",   email: "tanvir@email.com", role: "user",        joined: "May 2024", avatar: "TA", orders: 19 },
-  { id: "U006", name: "Meherun Nessa",  email: "mehr@email.com",   role: "deliveryBoy", joined: "Jun 2024", avatar: "MN", orders: 0  },
+  { id: "U001", name: "Rafi Hossain", email: "rafi@email.com", role: "user", joined: "Jan 2024", avatar: "RH", orders: 12 },
 ];
 
 const MOCK_PRODUCTS: Product[] = [
-  { id: "P001", name: "Wireless Earbuds Pro",   category: "Electronics", price: 49.99,  stock: 120, image: "🎧", status: "active" },
-  { id: "P002", name: "Running Shoes X2",       category: "Sports",      price: 89.00,  stock: 45,  image: "👟", status: "active" },
-  { id: "P003", name: "Leather Wallet",         category: "Accessories", price: 24.99,  stock: 200, image: "👜", status: "active" },
-  { id: "P004", name: "Smart Watch Series 5",   category: "Electronics", price: 199.00, stock: 30,  image: "⌚", status: "draft"  },
-  { id: "P005", name: "Yoga Mat Premium",       category: "Sports",      price: 35.00,  stock: 88,  image: "🧘", status: "active" },
-  { id: "P006", name: "Ceramic Coffee Mug",     category: "Home",        price: 12.50,  stock: 310, image: "☕", status: "active" },
+  { id: "P001", name: "Wireless Earbuds Pro", category: "Electronics", price: 49.99, stock: 120, image: "🎧", status: "active" },
 ];
 
 const MOCK_CATEGORIES: Category[] = [
   { id: "C001", name: "Electronics", slug: "electronics", count: 24 },
-  { id: "C002", name: "Sports",      slug: "sports",      count: 18 },
-  { id: "C003", name: "Accessories", slug: "accessories", count: 31 },
-  { id: "C004", name: "Home",        slug: "home",        count: 15 },
-  { id: "C005", name: "Clothing",    slug: "clothing",    count: 42 },
 ];
 
 const MOCK_ORDERS: Order[] = [
-  { id: "ORD-1041", customer: "Rafi Hossain",  items: 2, total: "$63.99",  status: "delivered",  date: "May 18" },
-  { id: "ORD-1042", customer: "Sumaiya Begum", items: 1, total: "$24.99",  status: "shipped",    date: "May 19" },
-  { id: "ORD-1043", customer: "Tanvir Ahmed",  items: 3, total: "$174.50", status: "processing", date: "May 20" },
-  { id: "ORD-1044", customer: "Nadia Islam",   items: 1, total: "$89.00",  status: "pending",    date: "May 21" },
-  { id: "ORD-1045", customer: "Karim Uddin",   items: 2, total: "$47.48",  status: "cancelled",  date: "May 21" },
-  { id: "ORD-1046", customer: "Rafi Hossain",  items: 1, total: "$199.00", status: "shipped",    date: "May 21" },
+  { id: "ORD-1041", customer: "Rafi Hossain", items: 2, total: "$63.99", status: "delivered", date: "May 18" },
 ];
 
 const REVENUE_DATA = [
@@ -70,22 +51,22 @@ const ORDERS_DATA = [
 
 // ─── Colour helpers ───────────────────────────────────────────
 const roleColors: Record<Role, string> = {
-  admin:       "bg-violet-500/15 text-violet-300 border border-violet-500/25",
+  admin: "bg-violet-500/15 text-violet-300 border border-violet-500/25",
   deliveryBoy: "bg-amber-500/15  text-amber-300  border border-amber-500/25",
-  user:        "bg-sky-500/15    text-sky-300    border border-sky-500/25",
+  user: "bg-sky-500/15    text-sky-300    border border-sky-500/25",
 };
 const orderColors: Record<OrderStatus, string> = {
-  delivered:  "bg-emerald-500/15 text-emerald-300 border border-emerald-500/25",
-  shipped:    "bg-sky-500/15     text-sky-300     border border-sky-500/25",
+  delivered: "bg-emerald-500/15 text-emerald-300 border border-emerald-500/25",
+  shipped: "bg-sky-500/15     text-sky-300     border border-sky-500/25",
   processing: "bg-amber-500/15   text-amber-300   border border-amber-500/25",
-  pending:    "bg-slate-500/15   text-slate-300   border border-slate-500/25",
-  cancelled:  "bg-rose-500/15    text-rose-300    border border-rose-500/25",
+  pending: "bg-slate-500/15   text-slate-300   border border-slate-500/25",
+  cancelled: "bg-rose-500/15    text-rose-300    border border-rose-500/25",
 };
 
 // ─── Reusable UI pieces ───────────────────────────────────────
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
   <div className={`rounded-2xl p-5 ${className}`}
-    style={{ background:"linear-gradient(145deg,#141b2d,#0f1420)", border:"1px solid rgba(255,255,255,0.06)" }}>
+    style={{ background: "linear-gradient(145deg,#141b2d,#0f1420)", border: "1px solid rgba(255,255,255,0.06)" }}>
     {children}
   </div>
 );
@@ -105,12 +86,12 @@ const Toggle = ({ checked, onChange }: { checked: boolean; onChange: () => void 
   </button>
 );
 
-const Btn = ({ children, variant="primary", size="sm", onClick, className="" }:
-  { children: React.ReactNode; variant?: "primary"|"ghost"|"danger"|"success"; size?: "sm"|"xs"; onClick?: () => void; className?: string }) => {
+const Btn = ({ children, variant = "primary", size = "sm", onClick, className = "" }:
+  { children: React.ReactNode; variant?: "primary" | "ghost" | "danger" | "success"; size?: "sm" | "xs"; onClick?: () => void; className?: string }) => {
   const v = {
     primary: "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-900/30",
-    ghost:   "bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.08]",
-    danger:  "bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/25",
+    ghost: "bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.08]",
+    danger: "bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/25",
     success: "bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/25",
   }[variant];
   const s = size === "xs" ? "px-2.5 py-1 text-xs" : "px-4 py-2 text-sm";
@@ -121,7 +102,7 @@ const Btn = ({ children, variant="primary", size="sm", onClick, className="" }:
 const Modal = ({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) => (
   <div className="fixed inset-0 z-100 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
     <div className="w-full max-w-md rounded-2xl p-6 shadow-2xl"
-      style={{ background:"#141b2d", border:"1px solid rgba(255,255,255,0.1)" }}>
+      style={{ background: "#141b2d", border: "1px solid rgba(255,255,255,0.1)" }}>
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-base font-bold text-white">{title}</h3>
         <button onClick={onClose} className="w-7 h-7 rounded-lg bg-white/[0.07] hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all">✕</button>
@@ -133,60 +114,100 @@ const Modal = ({ title, onClose, children }: { title: string; onClose: () => voi
 
 // ─── Sidebar nav items ────────────────────────────────────────
 const NAV = [
-  { id:"overview",    label:"Overview",    icon:"▦"  },
-  { id:"users",       label:"Users",       icon:"👥" },
-  { id:"categories",  label:"Categories",  icon:"🏷"  },
-  { id:"products",    label:"Products",    icon:"📦" },
-  { id:"orders",      label:"Orders",      icon:"📋" },
-  { id:"settings",    label:"Settings",    icon:"⚙"  },
+  { id: "overview", label: "Overview", icon: "▦" },
+  { id: "users", label: "Users", icon: "👥" },
+  { id: "categories", label: "Categories", icon: "🏷" },
+  { id: "products", label: "Products", icon: "📦" },
+  { id: "orders", label: "Orders", icon: "📋" },
+  { id: "settings", label: "Settings", icon: "⚙" },
 ] as const;
 
 // ═══════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════
 export default function AdminDashboard() {
-  const [section, setSection]         = useState<Section>("overview");
-  const [sideOpen, setSideOpen]       = useState(true);
+  const [section, setSection] = useState<Section>("overview");
+  const [sideOpen, setSideOpen] = useState(true);
 
   // Users state
-  const [users, setUsers]             = useState<User[]>(MOCK_USERS);
-  const [userModal, setUserModal]     = useState<User | null>(null);
-  const [userSearch, setUserSearch]   = useState("");
+  const [users, setUsers] = useState<User[]>(MOCK_USERS);
+  const [userModal, setUserModal] = useState<User | null>(null);
+  const [userSearch, setUserSearch] = useState("");
 
   // Products state
-  const [products, setProducts]       = useState<Product[]>(MOCK_PRODUCTS);
-  const [prodModal, setProdModal]     = useState<Product | null | "new">(null);
-  const [prodSearch, setProdSearch]   = useState("");
+  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
+  const [prodModal, setProdModal] = useState<Product | null | "new">(null);
+  const [prodSearch, setProdSearch] = useState("");
 
   // Categories state
-  const [categories, setCats]         = useState<Category[]>(MOCK_CATEGORIES);
-  const [catModal, setCatModal]       = useState<Category | null | "new">(null);
+  const [categories, setCats] = useState<Category[]>(MOCK_CATEGORIES);
+  const [catModal, setCatModal] = useState<Category | null | "new">(null);
 
   // Orders state
-  const [orders]                      = useState<Order[]>(MOCK_ORDERS);
+  const [orders] = useState<Order[]>(MOCK_ORDERS);
   const [orderSearch, setOrderSearch] = useState("");
 
   // Settings state
   const [settings, setSettings] = useState({
-    deliveryCharge: "5.00",
+    deliveryCharge: "0",
     maintenanceMode: false,
-    storeAddress: "12 Commerce St, Dhaka 1200",
-    storePhone: "+880 1700-000000",
-    storeEmail: "support@tarnix.com",
-    facebook: "https://facebook.com/tarnix",
-    instagram: "https://instagram.com/tarnix",
-    twitter: "https://twitter.com/tarnix",
+    storeAddress: "",
+    storePhone: "",
+    storeEmail: "",
+    facebook: "",
+    instagram: "",
+    twitter: "",
     youtube: "",
   });
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  useEffect(() => {
+    if (section !== "settings") return;
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setSettings({
+            deliveryCharge: String(data.settings.deliveryCharge ?? 0),
+            maintenanceMode: data.settings.maintenanceMode ?? false,
+            storeAddress: data.settings.storeAddress ?? "",
+            storePhone: data.settings.storePhone ?? "",
+            storeEmail: data.settings.storeEmail ?? "",
+            facebook: data.settings.facebook ?? "",
+            instagram: data.settings.instagram ?? "",
+            twitter: data.settings.twitter ?? "",
+            youtube: data.settings.youtube ?? "",
+          });
+        }
+      });
+  }, [section]);
+
+  const handleSaveSettings = async () => {
+    setSettingsLoading(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...settings,
+          deliveryCharge: parseFloat(settings.deliveryCharge) || 0,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) alert("Settings saved!");
+      else alert("Failed to save settings.");
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
 
   // ── Filtered data ──
-  const filteredUsers    = users.filter(u => u.name.toLowerCase().includes(userSearch.toLowerCase()) || u.email.toLowerCase().includes(userSearch.toLowerCase()));
+  const filteredUsers = users.filter(u => u.name.toLowerCase().includes(userSearch.toLowerCase()) || u.email.toLowerCase().includes(userSearch.toLowerCase()));
   const filteredProducts = products.filter(p => p.name.toLowerCase().includes(prodSearch.toLowerCase()));
-  const filteredOrders   = orders.filter(o => o.id.toLowerCase().includes(orderSearch.toLowerCase()) || o.customer.toLowerCase().includes(orderSearch.toLowerCase()));
+  const filteredOrders = orders.filter(o => o.id.toLowerCase().includes(orderSearch.toLowerCase()) || o.customer.toLowerCase().includes(orderSearch.toLowerCase()));
 
   // ── User actions ──
-  const deleteUser  = (id: string) => setUsers(u => u.filter(x => x.id !== id));
-  const changeRole  = (id: string, role: Role) => setUsers(u => u.map(x => x.id === id ? { ...x, role } : x));
+  const deleteUser = (id: string) => setUsers(u => u.filter(x => x.id !== id));
+  const changeRole = (id: string, role: Role) => setUsers(u => u.map(x => x.id === id ? { ...x, role } : x));
 
   // ── Product actions ──
   const deleteProduct = (id: string) => setProducts(p => p.filter(x => x.id !== id));
@@ -195,27 +216,27 @@ export default function AdminDashboard() {
   const deleteCat = (id: string) => setCats(c => c.filter(x => x.id !== id));
 
   const OVERVIEW_STATS = [
-    { label: "Total Revenue",  value: "$30,600", sub: "+18% this month", accent: "from-indigo-500 to-violet-600",  glow:"shadow-indigo-500/20", icon:"💰" },
-    { label: "Total Orders",   value: "348",     sub: "+24 this week",   accent: "from-sky-500 to-cyan-500",       glow:"shadow-sky-500/20",    icon:"📦" },
-    { label: "Total Users",    value: "1,240",   sub: "+56 this month",  accent: "from-emerald-500 to-teal-500",   glow:"shadow-emerald-500/20",icon:"👥" },
-    { label: "Products",       value: "94",      sub: "6 low stock",     accent: "from-amber-500 to-orange-500",   glow:"shadow-amber-500/20",  icon:"🛒" },
+    { label: "Total Revenue", value: "$30,600", sub: "+18% this month", accent: "from-indigo-500 to-violet-600", glow: "shadow-indigo-500/20", icon: "💰" },
+    { label: "Total Orders", value: "348", sub: "+24 this week", accent: "from-sky-500 to-cyan-500", glow: "shadow-sky-500/20", icon: "📦" },
+    { label: "Total Users", value: "1,240", sub: "+56 this month", accent: "from-emerald-500 to-teal-500", glow: "shadow-emerald-500/20", icon: "👥" },
+    { label: "Products", value: "94", sub: "6 low stock", accent: "from-amber-500 to-orange-500", glow: "shadow-amber-500/20", icon: "🛒" },
   ];
 
   return (
-    <div className="flex min-h-screen text-white" style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif", background:"#0b0f19" }}>
+    <div className="flex min-h-screen text-white" style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif", background: "#0b0f19" }}>
 
       {/* ════ SIDEBAR ════ */}
       <aside className={`shrink-0 flex flex-col transition-all duration-300 ease-in-out ${sideOpen ? "w-56" : "w-16"}`}
-        style={{ background:"linear-gradient(180deg,#111827 0%,#0d1421 100%)", borderRight:"1px solid rgba(255,255,255,0.05)" }}>
+        style={{ background: "linear-gradient(180deg,#111827 0%,#0d1421 100%)", borderRight: "1px solid rgba(255,255,255,0.05)" }}>
 
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 h-16 border-b" style={{ borderColor:"rgba(255,255,255,0.05)" }}>
+        <div className="flex items-center gap-3 px-4 h-16 border-b" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
           <div className="w-8 h-8 rounded-xl bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center font-black text-sm shrink-0 shadow-lg shadow-indigo-900/40">T</div>
           {sideOpen && <span className="font-black text-lg tracking-tight bg-linear-to-r from-white to-slate-400 bg-clip-text text-transparent whitespace-nowrap">Tarnix</span>}
         </div>
 
         {/* Collapse toggle */}
-        <div className="p-3 border-t" style={{ borderColor:"rgba(255,255,255,0.05)" }}>
+        <div className="p-3 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
           <button onClick={() => setSideOpen(v => !v)}
             className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-600 rounded-xl text-slate-500 hover:text-white hover:bg-white/20 transition-all duration-200 text-xs font-medium cursor-pointer">
             <span className={`transition-transform duration-300 ${sideOpen ? "" : "rotate-180"}`}>◀</span>
@@ -243,7 +264,7 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col min-w-0">
 
         {/* Top bar */}
-        <header className="h-16 flex items-center justify-between px-6 shrink-0" style={{ background:"rgba(11,15,25,0.8)", backdropFilter:"blur(12px)", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
+        <header className="h-16 flex items-center justify-between px-6 shrink-0" style={{ background: "rgba(11,15,25,0.8)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
           <div>
             <h1 className="text-base font-bold text-white capitalize">{section}</h1>
             <p className="text-xs text-slate-500">Admin Panel · Tarnix</p>
@@ -278,12 +299,12 @@ export default function AdminDashboard() {
                   <h2 className="text-sm font-bold text-white mb-1">Revenue (6 months)</h2>
                   <p className="text-xs text-slate-500 mb-4">Monthly earnings trend</p>
                   <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={REVENUE_DATA} margin={{ top:0, right:0, left:-20, bottom:0 }}>
+                    <LineChart data={REVENUE_DATA} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                      <XAxis dataKey="month" tick={{ fill:"#64748b", fontSize:11 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill:"#64748b", fontSize:10 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ background:"#1e293b", border:"1px solid #334155", borderRadius:"12px", fontSize:"12px" }} />
-                      <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={2.5} dot={{ fill:"#6366f1", r:4 }} activeDot={{ r:6, fill:"#818cf8" }} />
+                      <XAxis dataKey="month" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: "12px", fontSize: "12px" }} />
+                      <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={2.5} dot={{ fill: "#6366f1", r: 4 }} activeDot={{ r: 6, fill: "#818cf8" }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </Card>
@@ -291,12 +312,12 @@ export default function AdminDashboard() {
                   <h2 className="text-sm font-bold text-white mb-1">Orders This Week</h2>
                   <p className="text-xs text-slate-500 mb-4">Daily order volume</p>
                   <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={ORDERS_DATA} barSize={24} margin={{ top:0, right:0, left:-20, bottom:0 }}>
+                    <BarChart data={ORDERS_DATA} barSize={24} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                      <XAxis dataKey="day" tick={{ fill:"#64748b", fontSize:11 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill:"#64748b", fontSize:10 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ background:"#1e293b", border:"1px solid #334155", borderRadius:"12px", fontSize:"12px" }} />
-                      <Bar dataKey="orders" radius={[6,6,0,0]}>
+                      <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: "12px", fontSize: "12px" }} />
+                      <Bar dataKey="orders" radius={[6, 6, 0, 0]}>
                         {ORDERS_DATA.map((_, i) => <Cell key={i} fill={i === 5 ? "#6366f1" : "rgba(99,102,241,0.35)"} />)}
                       </Bar>
                     </BarChart>
@@ -311,7 +332,7 @@ export default function AdminDashboard() {
                   <Btn variant="ghost" size="xs" onClick={() => setSection("orders")}>View all →</Btn>
                 </div>
                 <div className="space-y-2">
-                  {MOCK_ORDERS.slice(0,4).map(o => (
+                  {MOCK_ORDERS.slice(0, 4).map(o => (
                     <div key={o.id} className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/30 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-indigo-500/15 flex items-center justify-center text-xs font-bold text-indigo-400">📋</div>
@@ -345,12 +366,12 @@ export default function AdminDashboard() {
               <Card className="overflow-hidden p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead><tr className="text-xs text-slate-500 uppercase tracking-wider border-b" style={{ borderColor:"rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.02)" }}>
-                      {["User","Email","Role","Joined","Orders","Actions"].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}
+                    <thead><tr className="text-xs text-slate-500 uppercase tracking-wider border-b" style={{ borderColor: "rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)" }}>
+                      {["User", "Email", "Role", "Joined", "Orders", "Actions"].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}
                     </tr></thead>
                     <tbody>
                       {filteredUsers.map(u => (
-                        <tr key={u.id} className="border-b hover:bg-white/20 transition-colors group" style={{ borderColor:"rgba(255,255,255,0.03)" }}>
+                        <tr key={u.id} className="border-b hover:bg-white/20 transition-colors group" style={{ borderColor: "rgba(255,255,255,0.03)" }}>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-2.5">
                               <div className="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold shrink-0">{u.avatar}</div>
@@ -510,7 +531,7 @@ export default function AdminDashboard() {
               </Card>
             </div>
           )} */}
-          {section === "orders" && (<OrdersSection />)} 
+          {section === "orders" && (<OrdersSection />)}
 
           {/* ══ SETTINGS ══════════════════════════════════════ */}
           {section === "settings" && (
@@ -561,10 +582,10 @@ export default function AdminDashboard() {
                 <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2"><span>🔗</span> Social Media Links</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {([
-                    { key:"facebook",  label:"Facebook URL",  icon:"📘" },
-                    { key:"instagram", label:"Instagram URL", icon:"📸" },
-                    { key:"twitter",   label:"Twitter / X URL",icon:"🐦" },
-                    { key:"youtube",   label:"YouTube URL",   icon:"▶" },
+                    { key: "facebook", label: "Facebook URL", icon: "📘" },
+                    { key: "instagram", label: "Instagram URL", icon: "📸" },
+                    { key: "twitter", label: "Twitter / X URL", icon: "🐦" },
+                    { key: "youtube", label: "YouTube URL", icon: "▶" },
                   ] as const).map(f => (
                     <div key={f.key} className="relative">
                       <label className="block text-xs font-semibold text-slate-400 mb-1.5">{f.icon} {f.label}</label>
@@ -579,8 +600,7 @@ export default function AdminDashboard() {
 
               {/* Save */}
               <div className="flex justify-end">
-                <Btn variant="primary" size="sm" onClick={() => alert("Settings saved!")}>
-                  💾 Save All Settings
+                <Btn variant="primary" size="sm" onClick={handleSaveSettings}> {settingsLoading ? "Saving..." : "💾 Save All Settings"}
                 </Btn>
               </div>
             </div>

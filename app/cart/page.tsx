@@ -6,6 +6,7 @@ import type { RootState } from "@/store";
 import { clearCart, removeFromCart, updateQuantity } from "@/store/slices/cartSlice";
 import Image from "next/image";
 import Link from "next/link";
+import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
 
 export default function CartPage() {
   const dispatch = useDispatch();
@@ -15,6 +16,9 @@ export default function CartPage() {
     (sum, item) => sum + (item.discountedPrice || item.price) * item.quantity,
     0
   );
+  const { deliveryCharge } = useDeliveryCharge();
+  const grandTotal = total + deliveryCharge;
+
 
   const increment = (id: string, qty: number) =>
     dispatch(updateQuantity({ id, quantity: qty + 1 }));
@@ -133,7 +137,9 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between text-sm mb-4">
                 <span className="text-gray-600">Shipping</span>
-                <span className="font-semibold text-emerald-600">Free</span>
+                <span className={`font-semibold ${deliveryCharge === 0 ? "text-emerald-600" : ""}`}>
+                  {deliveryCharge === 0 ? "Free" : `$${deliveryCharge.toFixed(2)}`}
+                </span>
               </div>
               <div className="flex justify-between text-base font-bold text-gray-800 border-t border-gray-100 pt-4 mb-6">
                 <span>Total</span>

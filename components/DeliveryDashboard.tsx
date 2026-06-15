@@ -1,270 +1,270 @@
-// // components/DeliveryBoy.tsx
-
-// "use client";
-// import Link from "next/link";
-
-// const DELIVERIES = [
-//   { id: "DEL-001", address: "12 Baker St, Dhaka", status: "Pending", time: "9:00 AM" },
-//   { id: "DEL-002", address: "55 Gulshan Ave, Dhaka", status: "On the way", time: "10:30 AM" },
-//   { id: "DEL-003", address: "77 Banani Rd, Dhaka", status: "Delivered", time: "8:15 AM" },
-// ];
-
-// const DeliveryDashboard = () => {
-//   return (
-//     <div className="min-h-[calc(100vh-4rem)] bg-slate-50">
-//       <div className="max-w-3xl mx-auto px-4 py-10">
-
-//         {/* Header */}
-//         <div className="mb-8">
-//           <h1 className="text-2xl font-bold text-slate-900">Delivery Dashboard</h1>
-//           <p className="text-slate-400 text-sm mt-1">Your assigned deliveries for today</p>
-//         </div>
-
-//         {/* Stats row */}
-//         <div className="grid grid-cols-3 gap-4 mb-8">
-//           {[
-//             { label: "Assigned", value: "3", color: "bg-blue-50 text-blue-700" },
-//             { label: "Delivered", value: "1", color: "bg-green-50 text-green-700" },
-//             { label: "Pending", value: "2", color: "bg-amber-50 text-amber-700" },
-//           ].map((s) => (
-//             <div key={s.label} className={`${s.color} rounded-2xl p-4 text-center font-semibold`}>
-//               <p className="text-2xl font-black">{s.value}</p>
-//               <p className="text-xs mt-0.5 opacity-80">{s.label}</p>
-//             </div>
-//           ))}
-//         </div>
-
-//         {/* Delivery list */}
-//         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
-//           <div className="px-5 py-4 border-b border-slate-100">
-//             <h2 className="text-sm font-bold text-slate-700">Today's Deliveries</h2>
-//           </div>
-//           <div className="divide-y divide-slate-50">
-//             {DELIVERIES.map((d) => (
-//               <div key={d.id} className="px-5 py-4 flex items-center justify-between hover:bg-slate-50/60 transition-colors">
-//                 <div className="flex items-start gap-3">
-//                   <div className="w-8 h-8 rounded-xl bg-indigo-100 flex items-center justify-center text-sm mt-0.5">
-//                     📦
-//                   </div>
-//                   <div>
-//                     <p className="text-sm font-semibold text-slate-800">{d.id}</p>
-//                     <p className="text-xs text-slate-400">{d.address}</p>
-//                     <p className="text-xs text-slate-400 mt-0.5">🕐 {d.time}</p>
-//                   </div>
-//                 </div>
-//                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ${d.status === "Delivered" ? "bg-green-50 text-green-600"
-//                     : d.status === "On the way" ? "bg-blue-50 text-blue-600"
-//                       : "bg-amber-50 text-amber-600"
-//                   }`}>
-//                   {d.status}
-//                 </span>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-
-//         {/* Action links */}
-//         <div className="flex gap-3">
-//           <Link href="/delivery" className="flex-1 text-center px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 active:scale-95">
-//             All Deliveries
-//           </Link>
-//           <Link href="/delivery/history" className="flex-1 text-center px-4 py-3 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl transition-all duration-200 active:scale-95">
-//             Delivery History
-//           </Link>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default DeliveryDashboard;
-
-
-
-// --------------------------------------------
-
 // components/DeliveryDashboard.tsx
-// Delivery boy's personal dashboard.
-// Shows: greeting, KPI stat cards (earnings, deliveries, today, last week),
-// order status breakdown, weekly bar chart (recharts), and live delivery list.
-// Design: warm dark theme (slate-900 base + amber/orange accents).
-// All data is mock — replace with real API calls as needed.
 
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
 
-// ─── Mock Data ────────────────────────────────────────────────
-const WEEKLY_DATA = [
-  { day: "Mon", deliveries: 8,  earned: 320 },
-  { day: "Tue", deliveries: 12, earned: 480 },
-  { day: "Wed", deliveries: 6,  earned: 240 },
-  { day: "Thu", deliveries: 15, earned: 600 },
-  { day: "Fri", deliveries: 10, earned: 400 },
-  { day: "Sat", deliveries: 18, earned: 720 },
-  { day: "Sun", deliveries: 4,  earned: 160 },
-];
+// ─── Types ────────────────────────────────────────────────────
+interface AvailableOrder {
+  _id: string;
+  shippingAddress: { fullName: string; address: string; city: string; phone: string };
+  items: { name: string; quantity: number; price: number }[];
+  total: number;
+  paymentMethod: string;
+  createdAt: string;
+}
 
-const TODAY_ORDERS = [
-  { id: "ORD-7821", customer: "Rafi Hossain",   address: "12 Gulshan Ave, Dhaka",    time: "9:00 AM",  status: "delivered",  amount: "$14.00" },
-  { id: "ORD-7822", customer: "Nadia Islam",    address: "55 Banani Rd, Dhaka",      time: "10:30 AM", status: "on-the-way", amount: "$9.50"  },
-  { id: "ORD-7823", customer: "Karim Uddin",    address: "77 Mirpur-10, Dhaka",      time: "11:15 AM", status: "on-the-way", amount: "$21.00" },
-  { id: "ORD-7824", customer: "Sumaiya Begum",  address: "3 Uttara Sec-7, Dhaka",   time: "12:00 PM", status: "pending",    amount: "$7.75"  },
-  { id: "ORD-7825", customer: "Tanvir Ahmed",   address: "90 Dhanmondi 32, Dhaka",  time: "1:30 PM",  status: "pending",    amount: "$18.25" },
-  { id: "ORD-7826", customer: "Meherun Nessa",  address: "14 Mohammadpur, Dhaka",   time: "2:45 PM",  status: "cancelled",  amount: "$5.00"  },
-];
+interface MyAssignment {
+  _id: string;
+  orderId: string;
+  status: "accepted" | "picked-up" | "on-the-way" | "delivered";
+  acceptedAt: string;
+  deliveredAt?: string;
+  order: {
+    _id: string;
+    shippingAddress: { fullName: string; address: string; city: string; phone: string };
+    items: { name: string; quantity: number; price: number }[];
+    total: number;
+    paymentMethod: string;
+  };
+}
 
-const STATUS_SUMMARY = [
-  { label: "Delivered",   count: 1,  color: "#10b981", bg: "bg-emerald-500/10",  text: "text-emerald-400",  dot: "bg-emerald-400", icon: "✓" },
-  { label: "On the Way",  count: 2,  color: "#f59e0b", bg: "bg-amber-500/10",    text: "text-amber-400",    dot: "bg-amber-400",   icon: "🛵" },
-  { label: "Pending",     count: 2,  color: "#6366f1", bg: "bg-indigo-500/10",   text: "text-indigo-400",   dot: "bg-indigo-400",  icon: "⏳" },
-  { label: "Cancelled",   count: 1,  color: "#f43f5e", bg: "bg-rose-500/10",     text: "text-rose-400",     dot: "bg-rose-400",    icon: "✕" },
-];
+type DeliveryStatus = "accepted" | "picked-up" | "on-the-way" | "delivered";
 
-const STAT_CARDS = [
-  {
-    label: "Total Earned",
-    value: "$2,920",
-    sub: "+$160 today",
-    positive: true,
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    accent: "from-amber-500 to-orange-500",
-    glow: "shadow-amber-500/20",
-  },
-  {
-    label: "Total Deliveries",
-    value: "73",
-    sub: "All time",
-    positive: true,
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-      </svg>
-    ),
-    accent: "from-sky-500 to-blue-600",
-    glow: "shadow-sky-500/20",
-  },
-  {
-    label: "Today's Deliveries",
-    value: "6",
-    sub: "1 done · 2 on way",
-    positive: true,
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-      </svg>
-    ),
-    accent: "from-emerald-500 to-teal-500",
-    glow: "shadow-emerald-500/20",
-  },
-  {
-    label: "Last Week",
-    value: "73",
-    sub: "+12% vs prev week",
-    positive: true,
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-      </svg>
-    ),
-    accent: "from-violet-500 to-purple-600",
-    glow: "shadow-violet-500/20",
-  },
-];
+// ─── Constants ────────────────────────────────────────────────
+const DELIVERY_STEPS: DeliveryStatus[] = ["accepted", "picked-up", "on-the-way", "delivered"];
 
-// ─── Status badge helper ───────────────────────────────────────
-const statusConfig: Record<string, { label: string; classes: string; dot: string }> = {
-  delivered:   { label: "Delivered",   classes: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20", dot: "bg-emerald-400" },
-  "on-the-way":{ label: "On the Way",  classes: "bg-amber-500/15 text-amber-400 border border-amber-500/20",     dot: "bg-amber-400 animate-pulse" },
-  pending:     { label: "Pending",     classes: "bg-indigo-500/15 text-indigo-400 border border-indigo-500/20",  dot: "bg-indigo-400" },
-  cancelled:   { label: "Cancelled",  classes: "bg-rose-500/15 text-rose-400 border border-rose-500/20",        dot: "bg-rose-400" },
+const STEP_META: Record<DeliveryStatus, { label: string; icon: string; color: string; bg: string; border: string }> = {
+  "accepted": { label: "Accepted", icon: "✓", color: "text-indigo-400", bg: "bg-indigo-500", border: "border-indigo-400" },
+  "picked-up": { label: "Picked Up", icon: "📦", color: "text-amber-400", bg: "bg-amber-500", border: "border-amber-400" },
+  "on-the-way": { label: "On the Way", icon: "🛵", color: "text-sky-400", bg: "bg-sky-500", border: "border-sky-400" },
+  "delivered": { label: "Delivered", icon: "✅", color: "text-emerald-400", bg: "bg-emerald-500", border: "border-emerald-400" },
 };
 
-// ─── Custom Tooltip for chart ─────────────────────────────────
+const STATUS_BADGE: Record<DeliveryStatus, string> = {
+  "accepted": "bg-indigo-500/15 text-indigo-400 border border-indigo-500/25",
+  "picked-up": "bg-amber-500/15 text-amber-400 border border-amber-500/25",
+  "on-the-way": "bg-sky-500/15 text-sky-400 border border-sky-500/25",
+  "delivered": "bg-emerald-500/15 text-emerald-400 border border-emerald-500/25",
+};
+
+const NEXT_STATUS: Partial<Record<DeliveryStatus, DeliveryStatus>> = {
+  "accepted": "picked-up",
+  "picked-up": "on-the-way",
+  "on-the-way": "delivered",
+};
+
+const NEXT_LABEL: Partial<Record<DeliveryStatus, string>> = {
+  "accepted": "Mark Picked Up",
+  "picked-up": "Mark On the Way",
+  "on-the-way": "✓ Confirm Delivery & Payment",
+};
+
+// ─── Custom Tooltip ───────────────────────────────────────────
 const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload?.length) {
-    return (
-      <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 shadow-2xl text-xs">
-        <p className="text-slate-300 font-semibold mb-1">{label}</p>
-        <p className="text-amber-400 font-bold">{payload[0].value} deliveries</p>
-        <p className="text-slate-400">${payload[0].value * 40} earned</p>
-      </div>
-    );
-  }
-  return null;
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 shadow-2xl text-xs">
+      <p className="text-slate-300 font-semibold mb-1">{label}</p>
+      <p className="text-amber-400 font-bold">{payload[0].value} deliveries</p>
+    </div>
+  );
 };
 
-// ─── Main component ───────────────────────────────────────────
-const DeliveryDashboard = () => {
-  const [chartMetric, setChartMetric] = useState<"deliveries" | "earned">("deliveries");
-  const todayTotal = TODAY_ORDERS.length;
-  const todayDone  = TODAY_ORDERS.filter((o) => o.status === "delivered").length;
+// ─── Skeleton ─────────────────────────────────────────────────
+const Skeleton = ({ className }: { className?: string }) => (
+  <div className={`animate-pulse bg-white/5 rounded-xl ${className}`} />
+);
 
+// ═══════════════════════════════════════════════════════════════
+export default function DeliveryDashboard() {
+  const { data: session } = useSession();
+
+  // ── Data state ──
+  const [availableOrders, setAvailableOrders] = useState<AvailableOrder[]>([]);
+  const [myAssignments, setMyAssignments] = useState<MyAssignment[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  // ── UI state ──
+  const [activeTab, setActiveTab] = useState<"available" | "my-orders">("available");
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [chartMetric, setChartMetric] = useState<"deliveries" | "earned">("deliveries");
+
+  // ── Derived stats from real data ──
+  const totalDeliveries = myAssignments.length;
+  const doneToday = myAssignments.filter((a) => a.status === "delivered").length;
+  const inProgress = myAssignments.filter((a) => a.status !== "delivered").length;
+  const totalEarned = myAssignments
+    .filter((a) => a.status === "delivered")
+    .reduce((sum, a) => sum + (a.order?.total || 0), 0);
+
+  // ── Weekly chart — built from real assignments ──
+  const weeklyData = (() => {
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const counts = Array(7).fill(0);
+    myAssignments.forEach((a) => {
+      const d = new Date(a.acceptedAt).getDay();
+      counts[d]++;
+    });
+    return days.map((day, i) => ({ day, deliveries: counts[i] }));
+  })();
+
+  // ── Fetch ──
+  const fetchData = useCallback(async () => {
+    setLoadingData(true);
+    try {
+      const [avail, mine] = await Promise.all([
+        fetch("/api/delivery/available-orders").then((r) => r.json()),
+        fetch("/api/delivery/my-orders").then((r) => r.json()),
+      ]);
+      if (avail.success) setAvailableOrders(avail.orders);
+      if (mine.success) setMyAssignments(mine.assignments);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoadingData(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  // ── Accept order ──
+  const handleAccept = async (orderId: string) => {
+    setAcceptingId(orderId);
+    try {
+      const res = await fetch("/api/delivery/accept-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchData();
+        setActiveTab("my-orders");
+      } else {
+        alert(data.error || "Failed to accept order.");
+      }
+    } finally {
+      setAcceptingId(null);
+    }
+  };
+
+  // ── Update delivery status ──
+  const handleUpdateStatus = async (orderId: string, status: DeliveryStatus) => {
+    if (status === "delivered") {
+      const ok = window.confirm(
+        "Confirm delivery?\n\nThis will:\n• Mark order as Delivered\n• Mark payment as Paid\n• Notify the admin"
+      );
+      if (!ok) return;
+    }
+    setUpdatingId(orderId);
+    try {
+      const res = await fetch("/api/delivery/update-status", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchData();
+      } else {
+        alert(data.error || "Failed to update.");
+      }
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const deliveryBoyName = session?.user?.name || "Delivery Boy";
+  const firstName = deliveryBoyName.split(" ")[0];
+  const progressPct = totalDeliveries > 0 ? Math.round((doneToday / totalDeliveries) * 100) : 0;
+
+  // ── Status breakdown ──
+  const statusBreakdown = DELIVERY_STEPS.map((s) => ({
+    ...STEP_META[s],
+    key: s,
+    count: myAssignments.filter((a) => a.status === s).length,
+  }));
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+
+  // ─────────────────────────────────────────────────────────────
   return (
     <div
       className="min-h-screen bg-[#0d1117] text-white"
-      style={{ fontFamily: "'Plus Jakarta Sans', 'DM Sans', sans-serif" }}
+      style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif" }}
     >
-      {/* ── Ambient background ── */}
+      {/* ── Ambient bg ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-5%] w-125 h-125 rounded-full bg-amber-500/5 blur-[120px]" />
-        <div className="absolute bottom-[10%] right-[-5%] w-100 h-100 rounded-full bg-sky-500/5 blur-[100px]" />
+        <div className="absolute -top-32 -left-20 w-125 h-125 rounded-full bg-amber-500/5 blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-100 h-100 rounded-full bg-sky-500/5 blur-[100px]" />
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
 
-        {/* ── Greeting banner ── */}
+        {/* ════ GREETING BANNER ════ */}
         <div
-          className="relative overflow-hidden rounded-3xl p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          className="relative overflow-hidden rounded-3xl p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-6"
           style={{
-            background: "linear-gradient(135deg, #1a2535 0%, #111827 60%, #1c1a30 100%)",
+            background: "linear-gradient(135deg,#1a2535 0%,#111827 60%,#1c1a30 100%)",
             border: "1px solid rgba(255,255,255,0.06)",
           }}
         >
-          {/* Decorative stripe */}
           <div className="absolute top-0 left-0 w-1.5 h-full rounded-l-3xl bg-linear-to-b from-amber-400 to-orange-500" />
-          <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-amber-500/8 blur-2xl" />
+          <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-amber-500/8 blur-3xl" />
 
           <div className="pl-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">🛵</span>
-              <span className="text-xs font-semibold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
                 On Duty
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-              Good morning, Rafiq! 👋
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              Good day, {firstName}! 👋
             </h1>
             <p className="text-slate-400 text-sm mt-1.5">
-              You have <span className="text-amber-400 font-semibold">{todayTotal - todayDone} deliveries</span> remaining today. Keep it up!
+              {inProgress > 0
+                ? <>You have <span className="text-amber-400 font-semibold">{inProgress} active</span> {inProgress === 1 ? "delivery" : "deliveries"} in progress.</>
+                : availableOrders.length > 0
+                  ? <><span className="text-amber-400 font-semibold">{availableOrders.length} orders</span> are waiting to be picked up.</>
+                  : "No active deliveries — check available orders!"}
             </p>
+
+            {/* Delivery boy info */}
+            <div className="flex items-center gap-2 mt-3">
+              <div className="w-8 h-8 rounded-full bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center text-xs font-black text-white">
+                {firstName[0]}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-white">{deliveryBoyName}</p>
+                <p className="text-[10px] text-slate-500">{session?.user?.email}</p>
+              </div>
+            </div>
           </div>
 
           {/* Progress ring */}
           <div className="pl-4 sm:pl-0 flex items-center gap-5 shrink-0">
             <div className="relative w-20 h-20">
               <svg className="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" />
                 <circle
                   cx="40" cy="40" r="32" fill="none"
-                  stroke="url(#grad)" strokeWidth="6"
-                  strokeDasharray={`${2 * Math.PI * 32}`}
-                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - todayDone / todayTotal)}`}
+                  stroke="url(#grad)" strokeWidth="7"
                   strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - progressPct / 100)}`}
+                  style={{ transition: "stroke-dashoffset 0.8s ease" }}
                 />
                 <defs>
                   <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -274,78 +274,111 @@ const DeliveryDashboard = () => {
                 </defs>
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-black text-white leading-none">{todayDone}</span>
-                <span className="text-[10px] text-slate-400">of {todayTotal}</span>
+                <span className="text-xl font-black text-white leading-none">{doneToday}</span>
+                <span className="text-[10px] text-slate-400">of {totalDeliveries}</span>
               </div>
             </div>
             <div>
-              <p className="text-xs text-slate-500 mb-0.5">Today's Progress</p>
-              <p className="text-sm font-bold text-white">{Math.round((todayDone / todayTotal) * 100)}% done</p>
-              <p className="text-xs text-amber-400 mt-0.5">🔥 Great pace!</p>
+              <p className="text-xs text-slate-500 mb-0.5">Completion</p>
+              <p className="text-lg font-black text-white">{progressPct}%</p>
+              <p className="text-xs text-amber-400 mt-0.5">
+                {progressPct === 100 ? "🎉 All done!" : progressPct > 50 ? "🔥 Great pace!" : "💪 Keep going!"}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* ── KPI Stat Cards ── */}
+        {/* ════ STAT CARDS ════ */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {STAT_CARDS.map((card, i) => (
+          {[
+            {
+              label: "Total Earned",
+              value: `$${totalEarned.toFixed(2)}`,
+              sub: "From delivered orders",
+              icon: "💰",
+              accent: "from-amber-500 to-orange-500",
+              glow: "shadow-amber-500/20",
+            },
+            {
+              label: "Total Accepted",
+              value: String(totalDeliveries),
+              sub: "All time",
+              icon: "📋",
+              accent: "from-indigo-500 to-violet-600",
+              glow: "shadow-indigo-500/20",
+            },
+            {
+              label: "Delivered",
+              value: String(doneToday),
+              sub: `${inProgress} in progress`,
+              icon: "✅",
+              accent: "from-emerald-500 to-teal-500",
+              glow: "shadow-emerald-500/20",
+            },
+            {
+              label: "Available Now",
+              value: String(availableOrders.length),
+              sub: "Ready to accept",
+              icon: "🚦",
+              accent: "from-sky-500 to-blue-600",
+              glow: "shadow-sky-500/20",
+            },
+          ].map((card) => (
             <div
               key={card.label}
-              className={`relative overflow-hidden rounded-2xl p-5 shadow-xl ${card.glow} group cursor-default`}
+              className={`relative overflow-hidden rounded-2xl p-5 shadow-xl ${card.glow} group`}
               style={{
-                background: "linear-gradient(145deg, #161d2b 0%, #111520 100%)",
+                background: "linear-gradient(145deg,#161d2b,#111520)",
                 border: "1px solid rgba(255,255,255,0.06)",
-                animationDelay: `${i * 80}ms`,
               }}
             >
-              {/* Icon */}
-              <div className={`w-9 h-9 rounded-xl bg-linear-to-br ${card.accent} flex items-center justify-center text-white shadow-lg mb-4`}>
+              <div className={`w-9 h-9 rounded-xl bg-linear-to-br ${card.accent} flex items-center justify-center text-lg mb-4 shadow-lg`}>
                 {card.icon}
               </div>
-
-              {/* Value */}
-              <p className="text-2xl font-black text-white tracking-tight leading-none mb-1">
-                {card.value}
-              </p>
-              <p className="text-xs text-slate-500 font-medium">{card.label}</p>
-
-              {/* Sub */}
-              <p className="text-[11px] text-emerald-400 font-semibold mt-2 flex items-center gap-1">
-                <span>↑</span>{card.sub}
-              </p>
-
-              {/* Corner glow */}
-              <div className={`absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-linear-to-br ${card.accent} opacity-10 blur-xl group-hover:opacity-20 transition-opacity duration-300`} />
+              {loadingData ? (
+                <>
+                  <Skeleton className="h-7 w-20 mb-1" />
+                  <Skeleton className="h-3 w-16" />
+                </>
+              ) : (
+                <>
+                  <p className="text-2xl font-black text-white tracking-tight leading-none mb-1">
+                    {card.value}
+                  </p>
+                  <p className="text-xs text-slate-500 font-medium">{card.label}</p>
+                  <p className="text-[11px] text-emerald-400 font-semibold mt-2">↑ {card.sub}</p>
+                </>
+              )}
+              <div className={`absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-linear-to-br ${card.accent} opacity-10 blur-xl group-hover:opacity-20 transition-opacity`} />
             </div>
           ))}
         </div>
 
-        {/* ── Chart + Status summary row ── */}
+        {/* ════ CHART + STATUS BREAKDOWN ════ */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* Bar Chart — spans 2 cols */}
+          {/* Bar Chart */}
           <div
             className="lg:col-span-2 rounded-2xl p-6"
             style={{
-              background: "linear-gradient(145deg, #161d2b 0%, #111520 100%)",
+              background: "linear-gradient(145deg,#161d2b,#111520)",
               border: "1px solid rgba(255,255,255,0.06)",
             }}
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-base font-bold text-white">Weekly Performance</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Last 7 days breakdown</p>
+                <h2 className="text-sm font-bold text-white">Weekly Activity</h2>
+                <p className="text-xs text-slate-500 mt-0.5">Your deliveries this week</p>
               </div>
               <div className="flex items-center gap-1 bg-slate-800/80 rounded-xl p-1 border border-slate-700/50">
                 {(["deliveries", "earned"] as const).map((m) => (
                   <button
                     key={m}
                     onClick={() => setChartMetric(m)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                      chartMetric === m
-                        ? "bg-amber-500 text-slate-900 shadow"
-                        : "text-slate-400 hover:text-white"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${chartMetric === m
+                      ? "bg-amber-500 text-slate-900 shadow"
+                      : "text-slate-400 hover:text-white"
+                      }`}
                   >
                     {m === "deliveries" ? "Orders" : "Earned"}
                   </button>
@@ -353,234 +386,437 @@ const DeliveryDashboard = () => {
               </div>
             </div>
 
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={WEEKLY_DATA} barSize={28} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={weeklyData} barSize={28} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis
-                  dataKey="day"
-                  tick={{ fill: "#64748b", fontSize: 11, fontWeight: 600 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fill: "#64748b", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)", radius: 8 }} />
-                <Bar dataKey={chartMetric} radius={[6, 6, 0, 0]}>
-                  {WEEKLY_DATA.map((entry, index) => (
+                <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+                <Bar dataKey="deliveries" radius={[6, 6, 0, 0]}>
+                  {weeklyData.map((entry, i) => (
                     <Cell
-                      key={index}
-                      fill={index === 5 ? "#f59e0b" : "rgba(245,158,11,0.35)"}
+                      key={i}
+                      fill={
+                        entry.deliveries === Math.max(...weeklyData.map((d) => d.deliveries))
+                          ? "#f59e0b"
+                          : "rgba(245,158,11,0.3)"
+                      }
                     />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
 
-            {/* Chart legend */}
-            <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/50">
+            <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/5">
               <div className="flex items-center gap-2 text-xs text-slate-400">
-                <span className="w-3 h-3 rounded bg-amber-500" />
-                Best day (Sat)
+                <span className="w-3 h-3 rounded bg-amber-500" /> Best day
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-400">
-                <span className="w-3 h-3 rounded bg-amber-500/35" />
-                Other days
+                <span className="w-3 h-3 rounded bg-amber-500/30" /> Other days
               </div>
             </div>
           </div>
 
-          {/* Status Summary */}
+          {/* Status breakdown */}
           <div
             className="rounded-2xl p-6 flex flex-col justify-between"
             style={{
-              background: "linear-gradient(145deg, #161d2b 0%, #111520 100%)",
+              background: "linear-gradient(145deg,#161d2b,#111520)",
               border: "1px solid rgba(255,255,255,0.06)",
             }}
           >
             <div>
-              <h2 className="text-base font-bold text-white mb-1">Order Status</h2>
-              <p className="text-xs text-slate-500 mb-5">Today's breakdown</p>
+              <h2 className="text-sm font-bold text-white mb-1">Delivery Status</h2>
+              <p className="text-xs text-slate-500 mb-5">All-time breakdown</p>
 
               <div className="space-y-3">
-                {STATUS_SUMMARY.map((s) => (
-                  <div key={s.label} className={`flex items-center justify-between px-4 py-3 rounded-xl ${s.bg}`}>
-                    <div className="flex items-center gap-3">
-                      <span className={`w-2 h-2 rounded-full ${s.dot}`} />
-                      <span className={`text-sm font-semibold ${s.text}`}>{s.label}</span>
+                {statusBreakdown.map((s) => (
+                  <div
+                    key={s.key}
+                    className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/3 border border-white/5"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-base">{s.icon}</span>
+                      <span className={`text-sm font-semibold ${s.color}`}>{s.label}</span>
                     </div>
-                    <span className={`text-lg font-black ${s.text}`}>{s.count}</span>
+                    {loadingData ? (
+                      <Skeleton className="h-5 w-6" />
+                    ) : (
+                      <span className={`text-lg font-black ${s.color}`}>{s.count}</span>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Donut-style total */}
-            <div className="mt-5 pt-5 border-t border-white/40 flex items-center justify-between">
-              <div>
-                <p className="text-xs text-slate-500">Completion rate</p>
-                <p className="text-xl font-black text-white mt-0.5">16.7%</p>
+            <div className="mt-5 pt-4 border-t border-white/5">
+              <p className="text-xs text-slate-500 mb-1">Success rate</p>
+              <p className="text-2xl font-black text-white">
+                {totalDeliveries > 0
+                  ? `${Math.round((doneToday / totalDeliveries) * 100)}%`
+                  : "—"}
+              </p>
+              <div className="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-linear-to-r from-amber-500 to-orange-500 transition-all duration-700"
+                  style={{ width: `${progressPct}%` }}
+                />
               </div>
-              <div className="w-12 h-12 rounded-full border-4 border-amber-500/30 border-t-amber-500 animate-spin" style={{ animationDuration: "3s" }} />
             </div>
           </div>
         </div>
 
-        {/* ── Today's Delivery List ── */}
+        {/* ════ ORDERS TABS ════ */}
         <div
           className="rounded-2xl overflow-hidden"
           style={{
-            background: "linear-gradient(145deg, #161d2b 0%, #111520 100%)",
+            background: "linear-gradient(145deg,#161d2b,#111520)",
             border: "1px solid rgba(255,255,255,0.06)",
           }}
         >
-          {/* Table header */}
-          <div className="px-6 py-4 border-b border-white/40 flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-white">Today's Deliveries</h2>
-              <p className="text-xs text-slate-500 mt-0.5">{todayTotal} orders assigned</p>
-            </div>
-            <span className="text-xs bg-amber-500/15 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-full font-semibold">
-              {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
-            </span>
-          </div>
-
-          {/* Desktop table */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-slate-500 uppercase tracking-wider border-b border-white/40">
-                  {["Order ID", "Customer", "Address", "Time", "Amount", "Status"].map((h) => (
-                    <th key={h} className="px-6 py-3 text-left font-semibold">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {TODAY_ORDERS.map((order, i) => {
-                  const cfg = statusConfig[order.status];
-                  return (
-                    <tr
-                      key={order.id}
-                      className="border-b border-white/30 hover:bg-white/20 transition-colors group"
-                    >
-                      <td className="px-6 py-4 font-mono text-xs text-amber-400 font-bold">{order.id}</td>
-                      <td className="px-6 py-4 text-white font-medium">{order.customer}</td>
-                      <td className="px-6 py-4 text-slate-400 text-xs max-w-40 truncate">{order.address}</td>
-                      <td className="px-6 py-4 text-slate-400 text-xs">{order.time}</td>
-                      <td className="px-6 py-4 text-white font-bold">{order.amount}</td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.classes}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                          {cfg.label}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile cards */}
-          <div className="md:hidden divide-y divide-white/40">
-            {TODAY_ORDERS.map((order) => {
-              const cfg = statusConfig[order.status];
-              return (
-                <div key={order.id} className="px-5 py-4 flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-mono text-xs text-amber-400 font-bold">{order.id}</span>
-                      <span className="text-xs text-slate-500">{order.time}</span>
-                    </div>
-                    <p className="text-sm font-semibold text-white">{order.customer}</p>
-                    <p className="text-xs text-slate-400 truncate mt-0.5">{order.address}</p>
-                  </div>
-                  <div className="flex flex-col items-end gap-2 shrink-0">
-                    <span className="text-sm font-bold text-white">{order.amount}</span>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${cfg.classes}`}>
-                      <span className={`w-1 h-1 rounded-full ${cfg.dot}`} />
-                      {cfg.label}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ── Bottom: Performance tips + quick actions ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-6">
-
-          {/* Performance card */}
-          <div
-            className="rounded-2xl p-6"
-            style={{
-              background: "linear-gradient(135deg, #1a2535 0%, #111827 100%)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg">⚡</span>
-              <h3 className="text-sm font-bold text-white">Performance</h3>
-            </div>
-            <div className="space-y-3">
-              {[
-                { label: "On-time rate",   value: 94, color: "bg-emerald-500" },
-                { label: "Customer rating", value: 87, color: "bg-amber-500"  },
-                { label: "Acceptance rate", value: 78, color: "bg-sky-500"    },
-              ].map((p) => (
-                <div key={p.label}>
-                  <div className="flex justify-between text-xs mb-1.5">
-                    <span className="text-slate-400">{p.label}</span>
-                    <span className="text-white font-bold">{p.value}%</span>
-                  </div>
-                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${p.color} rounded-full transition-all duration-700`}
-                      style={{ width: `${p.value}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick actions */}
-          <div
-            className="rounded-2xl p-6"
-            style={{
-              background: "linear-gradient(135deg, #1a2535 0%, #111827 100%)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg">🚀</span>
-              <h3 className="text-sm font-bold text-white">Quick Actions</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "All Deliveries",   href: "/delivery",         color: "bg-amber-500 hover:bg-amber-400 text-slate-900",            },
-                { label: "History",          href: "/delivery/history", color: "bg-white/[0.07] hover:bg-white/[0.1] text-white border border-white/[0.07]", },
-                { label: "My Earnings",      href: "/delivery/earnings",color: "bg-white/[0.07] hover:bg-white/[0.1] text-white border border-white/[0.07]", },
-                { label: "Support",          href: "/support",          color: "bg-white/[0.07] hover:bg-white/[0.1] text-white border border-white/[0.07]", },
-              ].map((a) => (
-                <a
-                  key={a.label}
-                  href={a.href}
-                  className={`flex items-center justify-center text-center px-3 py-3 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${a.color}`}
+          {/* Tab bar */}
+          <div className="px-6 py-4 border-b border-white/6 flex items-center justify-between flex-wrap gap-3">
+            <div className="flex gap-1 bg-slate-800/80 rounded-xl p-1 border border-slate-700/50">
+              {(["available", "my-orders"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === tab
+                    ? "bg-amber-500 text-slate-900 shadow"
+                    : "text-slate-400 hover:text-white"
+                    }`}
                 >
-                  {a.label}
-                </a>
+                  {tab === "available"
+                    ? `🚦 Available (${availableOrders.length})`
+                    : `📦 My Orders (${myAssignments.length})`}
+                </button>
               ))}
             </div>
+            <button
+              onClick={fetchData}
+              className="text-xs text-slate-400 hover:text-white bg-white/4 hover:bg-white/8 px-3 py-2 rounded-xl border border-white/6 transition-all flex items-center gap-1.5"
+            >
+              <span className={loadingData ? "animate-spin inline-block" : ""}>↻</span>
+              Refresh
+            </button>
           </div>
+
+          {/* ── Available Orders ── */}
+          {activeTab === "available" && (
+            <div className="p-6">
+              {loadingData ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full" />)}
+                </div>
+              ) : availableOrders.length === 0 ? (
+                <div className="text-center py-14">
+                  <div className="text-5xl mb-3">🎉</div>
+                  <p className="text-slate-300 text-sm font-bold">No orders available right now</p>
+                  <p className="text-slate-600 text-xs mt-1">
+                    Orders appear here when admin marks them as shipped.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {availableOrders.map((order) => (
+                    <div
+                      key={order._id}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white/3 border border-white/6 hover:border-amber-500/30 transition-all"
+                    >
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        {/* ID + payment badge */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-mono font-bold text-amber-400">
+                            #{order._id.slice(-6).toUpperCase()}
+                          </span>
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${order.paymentMethod === "cod"
+                            ? "bg-amber-500/15 text-amber-400 border-amber-500/25"
+                            : "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
+                            }`}>
+                            {order.paymentMethod === "cod" ? "💵 Collect Cash" : "💳 Already Paid"}
+                          </span>
+                        </div>
+
+                        {/* Customer */}
+                        <p className="text-sm font-bold text-white">
+                          {order.shippingAddress.fullName}
+                        </p>
+
+                        {/* Address */}
+                        <p className="text-xs text-slate-400 truncate">
+                          📍 {order.shippingAddress.address}, {order.shippingAddress.city}
+                        </p>
+
+                        {/* Phone */}
+                        <p className="text-xs text-slate-500">
+                          📞 {order.shippingAddress.phone}
+                        </p>
+
+                        {/* Items + total */}
+                        <div className="flex items-center gap-3 text-xs text-slate-500">
+                          <span>🛍 {order.items.reduce((s, i) => s + i.quantity, 0)} items</span>
+                          <span className="text-white font-black text-sm">
+                            ${order.total.toFixed(2)}
+                          </span>
+                          <span className="text-slate-600">{formatDate(order.createdAt)}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleAccept(order._id)}
+                        disabled={acceptingId === order._id}
+                        className="shrink-0 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 text-sm font-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-900/20"
+                      >
+                        {acceptingId === order._id ? (
+                          <span className="flex items-center gap-2">
+                            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                            </svg>
+                            Accepting…
+                          </span>
+                        ) : (
+                          "Accept Delivery 🛵"
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── My Orders ── */}
+          {activeTab === "my-orders" && (
+            <div className="p-6">
+              {loadingData ? (
+                <div className="space-y-3">
+                  {[1, 2].map((i) => <Skeleton key={i} className="h-40 w-full" />)}
+                </div>
+              ) : myAssignments.length === 0 ? (
+                <div className="text-center py-14">
+                  <div className="text-5xl mb-3">📭</div>
+                  <p className="text-slate-300 text-sm font-bold">No orders accepted yet</p>
+                  <p className="text-slate-600 text-xs mt-1">
+                    Go to Available tab to pick up your first delivery.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab("available")}
+                    className="mt-4 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 text-xs font-black transition-all"
+                  >
+                    View Available Orders
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {myAssignments.map((a) => {
+                    const currentIdx = DELIVERY_STEPS.indexOf(a.status);
+                    const next = NEXT_STATUS[a.status];
+                    const isExpanded = expandedId === a._id;
+                    const isDelivered = a.status === "delivered";
+
+                    return (
+                      <div
+                        key={a._id}
+                        className={`rounded-2xl border transition-all ${isDelivered
+                          ? "border-emerald-500/20 bg-emerald-500/3"
+                          : "border-white/6 bg-white/3"
+                          }`}
+                      >
+                        {/* Card header — always visible */}
+                        <div
+                          className="flex items-center justify-between gap-3 p-4 cursor-pointer"
+                          onClick={() => setExpandedId(isExpanded ? null : a._id)}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            {/* Status icon */}
+                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm shrink-0 ${isDelivered ? "bg-emerald-500/20" : "bg-amber-500/15"
+                              }`}>
+                              {STEP_META[a.status].icon}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-mono font-bold text-amber-400">
+                                  #{a.order?._id?.slice(-6).toUpperCase()}
+                                </span>
+                                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_BADGE[a.status]}`}>
+                                  {STEP_META[a.status].label}
+                                </span>
+                              </div>
+                              <p className="text-sm font-bold text-white truncate">
+                                {a.order?.shippingAddress?.fullName}
+                              </p>
+                              <p className="text-xs text-slate-500 truncate">
+                                📍 {a.order?.shippingAddress?.city}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className="text-sm font-black text-white">
+                              ${a.order?.total?.toFixed(2)}
+                            </span>
+                            <span className={`text-slate-500 text-xs transition-transform ${isExpanded ? "rotate-180" : ""}`}>
+                              ▼
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Expanded content */}
+                        {isExpanded && (
+                          <div className="px-4 pb-4 space-y-4 border-t border-white/5 pt-4">
+
+                            {/* Progress steps */}
+                            <div>
+                              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3">
+                                Delivery Progress
+                              </p>
+                              <div className="flex items-center">
+                                {DELIVERY_STEPS.map((step, idx) => {
+                                  const done = idx < currentIdx;
+                                  const current = idx === currentIdx;
+                                  const meta = STEP_META[step];
+                                  return (
+                                    <div key={step} className="flex items-center flex-1">
+                                      <div className="flex flex-col items-center gap-1">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${done ? "bg-amber-500 border-amber-500 text-slate-900" :
+                                          current ? `${meta.bg} ${meta.border} text-white ring-4 ring-white/10` :
+                                            "bg-slate-800 border-slate-700 text-slate-600"
+                                          }`}>
+                                          {done ? "✓" : meta.icon}
+                                        </div>
+                                        <span className={`text-[9px] font-semibold whitespace-nowrap ${current ? meta.color : done ? "text-amber-400" : "text-slate-600"
+                                          }`}>
+                                          {meta.label}
+                                        </span>
+                                      </div>
+                                      {idx < DELIVERY_STEPS.length - 1 && (
+                                        <div className={`flex-1 h-0.5 mb-4 mx-1 ${idx < currentIdx ? "bg-amber-500" : "bg-slate-700"
+                                          }`} />
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Customer info */}
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/40">
+                                <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Customer</p>
+                                <p className="text-xs font-bold text-white">{a.order?.shippingAddress?.fullName}</p>
+                                <p className="text-xs text-slate-400 mt-0.5">{a.order?.shippingAddress?.phone}</p>
+                              </div>
+                              <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/40">
+                                <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Address</p>
+                                <p className="text-xs font-bold text-white">{a.order?.shippingAddress?.city}</p>
+                                <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{a.order?.shippingAddress?.address}</p>
+                              </div>
+                            </div>
+
+                            {/* Items list */}
+                            <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/40">
+                              <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">Items</p>
+                              <div className="space-y-1.5">
+                                {a.order?.items?.map((item, idx) => (
+                                  <div key={idx} className="flex items-center justify-between">
+                                    <span className="text-xs text-slate-300 truncate">{item.name}</span>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <span className="text-xs text-slate-500">×{item.quantity}</span>
+                                      <span className="text-xs font-bold text-white">
+                                        ${(item.price * item.quantity).toFixed(2)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="flex justify-between pt-2 mt-2 border-t border-slate-700/50">
+                                <span className="text-xs font-bold text-slate-400">Total</span>
+                                <span className="text-sm font-black text-white">${a.order?.total?.toFixed(2)}</span>
+                              </div>
+                            </div>
+
+                            {/* Payment method */}
+                            <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border ${a.order?.paymentMethod === "cod"
+                              ? "bg-amber-500/10 border-amber-500/20"
+                              : "bg-emerald-500/10 border-emerald-500/20"
+                              }`}>
+                              <span>{a.order?.paymentMethod === "cod" ? "💵" : "💳"}</span>
+                              <div>
+                                <p className={`text-xs font-bold ${a.order?.paymentMethod === "cod" ? "text-amber-400" : "text-emerald-400"
+                                  }`}>
+                                  {a.order?.paymentMethod === "cod"
+                                    ? isDelivered ? "Cash Collected ✓" : "Collect cash on delivery"
+                                    : "Already paid online"}
+                                </p>
+                                {a.order?.paymentMethod === "cod" && !isDelivered && (
+                                  <p className="text-[10px] text-amber-400/60">
+                                    Amount: ${a.order?.total?.toFixed(2)}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Timestamps */}
+                            <div className="flex gap-3 text-xs text-slate-600">
+                              <span>Accepted: {formatTime(a.acceptedAt)}</span>
+                              {a.deliveredAt && (
+                                <span className="text-emerald-600">
+                                  · Delivered: {formatTime(a.deliveredAt)}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Action button */}
+                            <div className="flex justify-end">
+                              {next && !isDelivered ? (
+                                <button
+                                  onClick={() => handleUpdateStatus(a.orderId, next)}
+                                  disabled={updatingId === a.orderId}
+                                  className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${next === "delivered"
+                                    ? "bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-900/20"
+                                    : "bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg shadow-amber-900/20"
+                                    }`}
+                                >
+                                  {updatingId === a.orderId ? (
+                                    <>
+                                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                      </svg>
+                                      Updating…
+                                    </>
+                                  ) : (
+                                    NEXT_LABEL[a.status]
+                                  )}
+                                </button>
+                              ) : isDelivered ? (
+                                <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                                  <span className="text-emerald-400">✓</span>
+                                  <div>
+                                    <p className="text-xs font-bold text-emerald-400">Delivered & Paid</p>
+                                    {a.deliveredAt && (
+                                      <p className="text-[10px] text-emerald-400/60">
+                                        {formatTime(a.deliveredAt)}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ) : null}
+                            </div>
+
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
       </div>
     </div>
   );
-};
-
-export default DeliveryDashboard;
+}

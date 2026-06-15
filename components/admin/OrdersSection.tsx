@@ -206,8 +206,8 @@ export default function OrdersSection() {
         <button
           onClick={() => setStatusFilter("all")}
           className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${statusFilter === "all"
-              ? "bg-indigo-600 text-white border-indigo-500"
-              : "bg-white/5 text-slate-400 border-white/10 hover:border-white/20"
+            ? "bg-indigo-600 text-white border-indigo-500"
+            : "bg-white/5 text-slate-400 border-white/10 hover:border-white/20"
             }`}
         >
           All ({orders.length})
@@ -217,8 +217,8 @@ export default function OrdersSection() {
             key={s}
             onClick={() => setStatusFilter(s)}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all ${statusFilter === s
-                ? orderColors[s] + " ring-2 ring-white/20"
-                : orderColors[s] + " opacity-60 hover:opacity-100"
+              ? orderColors[s] + " ring-2 ring-white/20"
+              : orderColors[s] + " opacity-60 hover:opacity-100"
               }`}
           >
             {s} ({orders.filter((o) => o.orderStatus === s).length})
@@ -339,16 +339,25 @@ export default function OrdersSection() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-400 mb-1.5">Payment Status</label>
-                <select
-                  value={viewOrder.paymentStatus}
-                  disabled={updating === viewOrder._id}
-                  onChange={(e) => updateOrder(viewOrder._id, "paymentStatus", e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 disabled:opacity-50"
-                >
-                  {PAYMENT_STATUSES.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
+                {viewOrder.orderStatus === "delivered" ? (
+                  // ← Read-only when delivered — auto-set by delivery boy
+                  <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="text-sm font-bold text-emerald-400">Paid</span>
+                    <span className="text-xs text-emerald-400/60 ml-auto">Auto-confirmed on delivery</span>
+                  </div>
+                ) : (
+                  <select
+                    value={viewOrder.paymentStatus}
+                    disabled={updating === viewOrder._id}
+                    onChange={(e) => updateOrder(viewOrder._id, "paymentStatus", e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/60 disabled:opacity-50"
+                  >
+                    {PAYMENT_STATUSES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
 

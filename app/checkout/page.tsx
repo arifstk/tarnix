@@ -58,6 +58,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "@/components/CheckoutForm";
 import Link from "next/link";
+import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
 
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
@@ -66,6 +67,8 @@ export default function CheckoutPage() {
   const cart = useSelector((s: RootState) => s.cart.items);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [stripeError, setStripeError] = useState("");
+
+  const { deliveryCharge } = useDeliveryCharge();
 
   const subtotal = cart.reduce(
     (sum, item) => sum + (item.discountedPrice || item.price) * item.quantity,
@@ -140,7 +143,7 @@ export default function CheckoutPage() {
         ) : (
           // clientSecret passed directly to Elements — required by Stripe
           <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm cart={cart} subtotal={subtotal} clientSecret={clientSecret} />
+            <CheckoutForm cart={cart} subtotal={subtotal} clientSecret={clientSecret} deliveryCharge={deliveryCharge} />
           </Elements>
         )}
       </div>
