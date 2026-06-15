@@ -405,132 +405,13 @@ export default function AdminDashboard() {
           )}
 
           {/* ══ PRODUCTS ══════════════════════════════════════ */}
-          {/* {section === "products" && (
-            <div className="max-w-6xl space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-bold text-white">Manage Products</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">{products.length} products listed</p>
-                </div>
-                <div className="flex gap-2">
-                  <input value={prodSearch} onChange={e => setProdSearch(e.target.value)} placeholder="Search products…"
-                    className="px-3.5 py-2 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 w-52" />
-                  <Btn variant="primary" onClick={() => setProdModal("new")}>+ Add Product</Btn>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {filteredProducts.map(p => (
-                  <Card key={p.id} className="relative group">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-slate-700 to-slate-800 flex items-center justify-center text-2xl shadow-inner">{p.image}</div>
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${p.status === "active" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20" : "bg-slate-500/15 text-slate-400 border border-slate-500/20"}`}>{p.status}</span>
-                    </div>
-                    <h3 className="text-sm font-bold text-white leading-tight mb-1">{p.name}</h3>
-                    <p className="text-xs text-slate-500 mb-3">{p.category}</p>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-lg font-black text-white">${p.price}</span>
-                      <span className={`text-xs font-semibold ${p.stock < 50 ? "text-amber-400" : "text-slate-400"}`}>{p.stock} in stock</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Btn variant="ghost" size="xs" className="flex-1" onClick={() => setProdModal(p)}>✏ Edit</Btn>
-                      <Btn variant="danger" size="xs" className="flex-1" onClick={() => deleteProduct(p.id)}>🗑 Delete</Btn>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )} */}
           {section === "products" && <ProductsSection />}
-          {/* <ProductsSection /> */}
 
           {/* ══ CATEGORIES ════════════════════════════════════ */}
-          {/* {section === "categories" && (
-            <div className="max-w-2xl space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-white">Manage Categories</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">{categories.length} categories</p>
-                </div>
-                <Btn variant="primary" onClick={() => setCatModal("new")}>+ Add Category</Btn>
-              </div>
-              <Card className="p-0 overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead><tr className="text-xs text-slate-500 uppercase tracking-wider border-b" style={{ borderColor:"rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.02)" }}>
-                    {["Name","Slug","Products","Actions"].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}
-                  </tr></thead>
-                  <tbody>
-                    {categories.map(c => (
-                      <tr key={c.id} className="border-b hover:bg-white/20 transition-colors" style={{ borderColor:"rgba(255,255,255,0.03)" }}>
-                        <td className="px-5 py-3.5">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-7 h-7 rounded-lg bg-indigo-500/15 flex items-center justify-center text-xs">🏷</div>
-                            <span className="font-medium text-white">{c.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-mono text-xs text-slate-400">{c.slug}</td>
-                        <td className="px-5 py-3.5 text-white font-bold">{c.count}</td>
-                        <td className="px-5 py-3.5">
-                          <div className="flex gap-1.5">
-                            <Btn variant="ghost" size="xs" onClick={() => setCatModal(c)}>Edit</Btn>
-                            <Btn variant="danger" size="xs" onClick={() => deleteCat(c.id)}>Delete</Btn>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Card>
-            </div>
-          )} */}
           {section === "categories" && <CategoriesSection />}
 
           {/* ══ ORDERS ════════════════════════════════════════ */}
-          {/* {section === "orders" && (
-            <div className="max-w-6xl space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-bold text-white">Manage Orders</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">{orders.length} total orders</p>
-                </div>
-                <input value={orderSearch} onChange={e => setOrderSearch(e.target.value)} placeholder="Search order or customer…"
-                  className="px-3.5 py-2 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 w-64" />
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                {(["pending","processing","shipped","delivered","cancelled"] as OrderStatus[]).map(s => (
-                  <span key={s} className={`text-xs font-semibold px-3 py-1.5 rounded-full ${orderColors[s]}`}>
-                    {s} ({orders.filter(o => o.status === s).length})
-                  </span>
-                ))}
-              </div>
-              <Card className="p-0 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead><tr className="text-xs text-slate-500 uppercase tracking-wider border-b" style={{ borderColor:"rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.02)" }}>
-                      {["Order ID","Customer","Items","Total","Status","Date","Action"].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}
-                    </tr></thead>
-                    <tbody>
-                      {filteredOrders.map(o => (
-                        <tr key={o.id} className="border-b hover:bg-white/20 transition-colors" style={{ borderColor:"rgba(255,255,255,0.03)" }}>
-                          <td className="px-5 py-3.5 font-mono text-xs text-indigo-400 font-bold">{o.id}</td>
-                          <td className="px-5 py-3.5 text-white font-medium">{o.customer}</td>
-                          <td className="px-5 py-3.5 text-slate-400">{o.items}</td>
-                          <td className="px-5 py-3.5 text-white font-bold">{o.total}</td>
-                          <td className="px-5 py-3.5">
-                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${orderColors[o.status]}`}>{o.status}</span>
-                          </td>
-                          <td className="px-5 py-3.5 text-slate-400 text-xs">{o.date}</td>
-                          <td className="px-5 py-3.5">
-                            <Btn variant="ghost" size="xs">View</Btn>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </div>
-          )} */}
+
           {section === "orders" && (<OrdersSection />)}
 
           {/* ══ SETTINGS ══════════════════════════════════════ */}
