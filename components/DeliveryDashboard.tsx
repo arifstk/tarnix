@@ -1,4 +1,5 @@
 // components/DeliveryDashboard.tsx
+
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
@@ -23,6 +24,7 @@ interface MyAssignment {
   status: "accepted" | "picked-up" | "on-the-way" | "delivered";
   acceptedAt: string;
   deliveredAt?: string;
+  deliveryFee: number;
   order: {
     _id: string;
     shippingAddress: { fullName: string; address: string; city: string; phone: string };
@@ -101,7 +103,7 @@ export default function DeliveryDashboard() {
   const inProgress = myAssignments.filter((a) => a.status !== "delivered").length;
   const totalEarned = myAssignments
     .filter((a) => a.status === "delivered")
-    .reduce((sum, a) => sum + (a.order?.total || 0), 0);
+    .reduce((sum, a) => sum + (a.deliveryFee || 0), 0);
 
   // ── Weekly chart — built from real assignments ──
   const weeklyData = (() => {
@@ -293,7 +295,7 @@ export default function DeliveryDashboard() {
             {
               label: "Total Earned",
               value: `$${totalEarned.toFixed(2)}`,
-              sub: "From delivered orders",
+              sub: `From ${doneToday} delivered order${doneToday !== 1 ? "s" : ""}`,
               icon: "💰",
               accent: "from-amber-500 to-orange-500",
               glow: "shadow-amber-500/20",
@@ -375,8 +377,8 @@ export default function DeliveryDashboard() {
                     key={m}
                     onClick={() => setChartMetric(m)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${chartMetric === m
-                        ? "bg-amber-500 text-slate-900 shadow"
-                        : "text-slate-400 hover:text-white"
+                      ? "bg-amber-500 text-slate-900 shadow"
+                      : "text-slate-400 hover:text-white"
                       }`}
                   >
                     {m === "deliveries" ? "Orders" : "Earned"}
@@ -481,8 +483,8 @@ export default function DeliveryDashboard() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === tab
-                      ? "bg-amber-500 text-slate-900 shadow"
-                      : "text-slate-400 hover:text-white"
+                    ? "bg-amber-500 text-slate-900 shadow"
+                    : "text-slate-400 hover:text-white"
                     }`}
                 >
                   {tab === "available"
@@ -529,8 +531,8 @@ export default function DeliveryDashboard() {
                             #{order._id.slice(-6).toUpperCase()}
                           </span>
                           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${order.paymentMethod === "cod"
-                              ? "bg-amber-500/15 text-amber-400 border-amber-500/25"
-                              : "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
+                            ? "bg-amber-500/15 text-amber-400 border-amber-500/25"
+                            : "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
                             }`}>
                             {order.paymentMethod === "cod" ? "💵 Collect Cash" : "💳 Already Paid"}
                           </span>
@@ -618,8 +620,8 @@ export default function DeliveryDashboard() {
                       <div
                         key={a._id}
                         className={`rounded-2xl border transition-all ${isDelivered
-                            ? "border-emerald-500/20 bg-emerald-500/3"
-                            : "border-white/6 bg-white/3"
+                          ? "border-emerald-500/20 bg-emerald-500/3"
+                          : "border-white/6 bg-white/3"
                           }`}
                       >
                         {/* Card header — always visible */}
@@ -679,8 +681,8 @@ export default function DeliveryDashboard() {
                                     <div key={step} className="flex items-center flex-1">
                                       <div className="flex flex-col items-center gap-1">
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${done ? "bg-amber-500 border-amber-500 text-slate-900" :
-                                            current ? `${meta.bg} ${meta.border} text-white ring-4 ring-white/10` :
-                                              "bg-slate-800 border-slate-700 text-slate-600"
+                                          current ? `${meta.bg} ${meta.border} text-white ring-4 ring-white/10` :
+                                            "bg-slate-800 border-slate-700 text-slate-600"
                                           }`}>
                                           {done ? "✓" : meta.icon}
                                         </div>
@@ -729,16 +731,24 @@ export default function DeliveryDashboard() {
                                   </div>
                                 ))}
                               </div>
+                              {/* total */}
                               <div className="flex justify-between pt-2 mt-2 border-t border-slate-700/50">
                                 <span className="text-xs font-bold text-slate-400">Total</span>
                                 <span className="text-sm font-black text-white">${a.order?.total?.toFixed(2)}</span>
+                              </div>
+                              {/* delivery fee  */}
+                              <div className="flex justify-between pt-2 mt-2 border-t border-slate-700/50">
+                                <span className="text-xs font-bold text-amber-400">Your Delivery Fee</span>
+                                <span className="text-sm font-black text-amber-400">
+                                  ${(a.deliveryFee || 0).toFixed(2)}
+                                </span>
                               </div>
                             </div>
 
                             {/* Payment method */}
                             <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border ${a.order?.paymentMethod === "cod"
-                                ? "bg-amber-500/10 border-amber-500/20"
-                                : "bg-emerald-500/10 border-emerald-500/20"
+                              ? "bg-amber-500/10 border-amber-500/20"
+                              : "bg-emerald-500/10 border-emerald-500/20"
                               }`}>
                               <span>{a.order?.paymentMethod === "cod" ? "💵" : "💳"}</span>
                               <div>
@@ -773,8 +783,8 @@ export default function DeliveryDashboard() {
                                   onClick={() => handleUpdateStatus(a.orderId, next)}
                                   disabled={updatingId === a.orderId}
                                   className={`px-5 py-2.5 rounded-xl text-sm font-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${next === "delivered"
-                                      ? "bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-900/20"
-                                      : "bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg shadow-amber-900/20"
+                                    ? "bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-900/20"
+                                    : "bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg shadow-amber-900/20"
                                     }`}
                                 >
                                   {updatingId === a.orderId ? (

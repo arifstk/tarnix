@@ -7,7 +7,6 @@ import Settings from "@/models/Settings";
 export async function GET() {
   try {
     await dbConnect();
-    // Always return one settings doc — create default if none exists
     let settings = await Settings.findOne();
     if (!settings) settings = await Settings.create({});
     return NextResponse.json({ success: true, settings });

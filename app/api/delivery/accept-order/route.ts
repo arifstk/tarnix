@@ -1,5 +1,4 @@
 // app/api/delivery/accept-order/route.ts
-// CHANGELOG: Delivery boy accepts a shipped order — creates assignment + notifies admin
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -8,6 +7,7 @@ import dbConnect from "@/lib/db";
 import Order from "@/models/Order";
 import DeliveryAssignment from "@/models/DeliveryAssignment";
 import { authOptions } from "../../auth/[...nextauth]/route";
+import Settings from "@/models/Settings";
 // import Notification from "@/models/Notification";
 
 export async function POST(req: NextRequest) {
@@ -38,11 +38,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ── Snapshot current fee
+    const settings = await Settings.findOne();
+    const deliveryFee = settings?.deliveryFeePerOrder ?? 50;
+
     // Create assignment
     const assignment = await DeliveryAssignment.create({
       orderId,
       deliveryBoyEmail: session.user.email,
-      deliveryBoyName: session.user.name || "Delivery Boy",
+      deliveryBoyName: session.user.name || "Delivery Boy", deliveryFee,
       status: "accepted",
     });
 

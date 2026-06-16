@@ -7,6 +7,7 @@ export interface IDeliveryAssignment extends Document {
   deliveryBoyEmail: string;
   deliveryBoyName: string;
   status: "accepted" | "picked-up" | "on-the-way" | "delivered";
+  deliveryFee: number;
   acceptedAt: Date;
   deliveredAt?: Date;
 }
@@ -26,6 +27,7 @@ const DeliveryAssignmentSchema = new Schema<IDeliveryAssignment>(
       enum: ["accepted", "picked-up", "on-the-way", "delivered"],
       default: "accepted",
     },
+    deliveryFee:      { type: Number, default: 0 },
     acceptedAt: { type: Date, default: Date.now },
     deliveredAt: { type: Date },
   },
@@ -33,7 +35,5 @@ const DeliveryAssignmentSchema = new Schema<IDeliveryAssignment>(
 );
 
 export default models.DeliveryAssignment ||
-  mongoose.model<IDeliveryAssignment>(
-    "DeliveryAssignment",
-    DeliveryAssignmentSchema,
+  mongoose.model<IDeliveryAssignment>("DeliveryAssignment", DeliveryAssignmentSchema,
   );

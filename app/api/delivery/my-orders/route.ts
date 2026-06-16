@@ -1,5 +1,4 @@
 // app/api/delivery/my-orders/route.ts
-// CHANGELOG: Returns orders accepted by the logged-in delivery boy
 
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";

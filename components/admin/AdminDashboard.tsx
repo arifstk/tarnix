@@ -9,6 +9,7 @@ import {
 import ProductsSection from "./ProductsSection";
 import CategoriesSection from "./CategoriesSection";
 import OrdersSection from "./OrdersSection";
+import OverviewSection from "./OverviewSection";
 
 // ─── Types ────────────────────────────────────────────────────
 type Role = "user" | "admin" | "deliveryBoy";
@@ -49,7 +50,7 @@ const ORDERS_DATA = [
   { day: "Sun", orders: 12 },
 ];
 
-// ─── Colour helpers ───────────────────────────────────────────
+// ─── Color helpers ───────────────────────────────────────────
 const roleColors: Record<Role, string> = {
   admin: "bg-violet-500/15 text-violet-300 border border-violet-500/25",
   deliveryBoy: "bg-amber-500/15  text-amber-300  border border-amber-500/25",
@@ -98,7 +99,7 @@ const Btn = ({ children, variant = "primary", size = "sm", onClick, className = 
   return <button onClick={onClick} className={`${v} ${s} rounded-xl font-semibold transition-all duration-200 active:scale-95 ${className}`}>{children}</button>;
 };
 
-// ─── Modal wrapper ────────────────────────────────────────────
+// ─── Modal wrapper ───────────────────────────────────
 const Modal = ({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) => (
   <div className="fixed inset-0 z-100 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
     <div className="w-full max-w-md rounded-2xl p-6 shadow-2xl"
@@ -112,7 +113,7 @@ const Modal = ({ title, onClose, children }: { title: string; onClose: () => voi
   </div>
 );
 
-// ─── Sidebar nav items ────────────────────────────────────────
+// ─── Sidebar nav items ─────────────────────────────────
 const NAV = [
   { id: "overview", label: "Overview", icon: "▦" },
   { id: "users", label: "Users", icon: "👥" },
@@ -122,9 +123,7 @@ const NAV = [
   { id: "settings", label: "Settings", icon: "⚙" },
 ] as const;
 
-// ═══════════════════════════════════════════════════════════════
-// MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════
+// MAIN COMPONENT ═══════════════════════════════════
 export default function AdminDashboard() {
   const [section, setSection] = useState<Section>("overview");
   const [sideOpen, setSideOpen] = useState(true);
@@ -150,6 +149,7 @@ export default function AdminDashboard() {
   // Settings state
   const [settings, setSettings] = useState({
     deliveryCharge: "0",
+    deliveryFeePerOrder: "50",
     maintenanceMode: false,
     storeAddress: "",
     storePhone: "",
@@ -168,6 +168,7 @@ export default function AdminDashboard() {
         if (data.success) {
           setSettings({
             deliveryCharge: String(data.settings.deliveryCharge ?? 0),
+            deliveryFeePerOrder: String(data.settings.deliveryFeePerOrder ?? 50),
             maintenanceMode: data.settings.maintenanceMode ?? false,
             storeAddress: data.settings.storeAddress ?? "",
             storePhone: data.settings.storePhone ?? "",
@@ -190,6 +191,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({
           ...settings,
           deliveryCharge: parseFloat(settings.deliveryCharge) || 0,
+          deliveryFeePerOrder: parseFloat(settings.deliveryFeePerOrder) || 50,
         }),
       });
       const data = await res.json();
@@ -278,79 +280,7 @@ export default function AdminDashboard() {
         <main className="flex-1 overflow-y-auto p-6">
 
           {/* ══ OVERVIEW ══════════════════════════════════════ */}
-          {section === "overview" && (
-            <div className="space-y-6 max-w-6xl">
-              {/* Stats */}
-              <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-                {OVERVIEW_STATS.map((s, i) => (
-                  <Card key={s.label} className={`shadow-xl ${s.glow} relative overflow-hidden group`}>
-                    <div className={`w-10 h-10 rounded-xl bg-linear-to-br ${s.accent} flex items-center justify-center text-lg mb-4 shadow-lg`}>{s.icon}</div>
-                    <p className="text-2xl font-black text-white tracking-tight">{s.value}</p>
-                    <p className="text-xs text-slate-500 mt-0.5 font-medium">{s.label}</p>
-                    <p className="text-xs text-emerald-400 font-semibold mt-2">↑ {s.sub}</p>
-                    <div className={`absolute -bottom-5 -right-5 w-24 h-24 rounded-full bg-linear-to-br ${s.accent} opacity-8 blur-xl group-hover:opacity-15 transition-opacity duration-300`} />
-                  </Card>
-                ))}
-              </div>
-
-              {/* Charts row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <h2 className="text-sm font-bold text-white mb-1">Revenue (6 months)</h2>
-                  <p className="text-xs text-slate-500 mb-4">Monthly earnings trend</p>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={REVENUE_DATA} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                      <XAxis dataKey="month" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: "12px", fontSize: "12px" }} />
-                      <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={2.5} dot={{ fill: "#6366f1", r: 4 }} activeDot={{ r: 6, fill: "#818cf8" }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </Card>
-                <Card>
-                  <h2 className="text-sm font-bold text-white mb-1">Orders This Week</h2>
-                  <p className="text-xs text-slate-500 mb-4">Daily order volume</p>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={ORDERS_DATA} barSize={24} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                      <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: "12px", fontSize: "12px" }} />
-                      <Bar dataKey="orders" radius={[6, 6, 0, 0]}>
-                        {ORDERS_DATA.map((_, i) => <Cell key={i} fill={i === 5 ? "#6366f1" : "rgba(99,102,241,0.35)"} />)}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Card>
-              </div>
-
-              {/* Recent orders quick view */}
-              <Card>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-bold text-white">Recent Orders</h2>
-                  <Btn variant="ghost" size="xs" onClick={() => setSection("orders")}>View all →</Btn>
-                </div>
-                <div className="space-y-2">
-                  {MOCK_ORDERS.slice(0, 4).map(o => (
-                    <div key={o.id} className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/30 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-500/15 flex items-center justify-center text-xs font-bold text-indigo-400">📋</div>
-                        <div>
-                          <p className="text-sm font-medium text-white">{o.id}</p>
-                          <p className="text-xs text-slate-500">{o.customer} · {o.date}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-white">{o.total}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${orderColors[o.status]}`}>{o.status}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-          )}
+          {section === "overview" && (<OverviewSection />)}
 
           {/* ══ USERS ═════════════════════════════════════════ */}
           {section === "users" && (
@@ -426,8 +356,13 @@ export default function AdminDashboard() {
               <Card>
                 <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2"><span>🚚</span> Delivery & Operations</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                  <Input label="Delivery Charge ($)" type="number" value={settings.deliveryCharge}
-                    onChange={e => setSettings(s => ({ ...s, deliveryCharge: e.target.value }))} placeholder="5.00" />
+                  <Input
+                    label="Delivery Fee per Order ($)"
+                    type="number"
+                    value={settings.deliveryFeePerOrder ?? "50"}
+                    onChange={(e) => setSettings((s: any) => ({ ...s, deliveryFeePerOrder: e.target.value }))}
+                    placeholder="50.00"
+                  />
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/40 border border-slate-700/40">
                   <div>

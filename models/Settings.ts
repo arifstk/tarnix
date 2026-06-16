@@ -4,6 +4,7 @@ import mongoose, { Schema, Document, models } from "mongoose";
 
 export interface ISettings extends Document {
   deliveryCharge: number;
+  deliveryFeePerOrder: number;
   maintenanceMode: boolean;
   storeAddress: string;
   storePhone: string;
@@ -17,6 +18,7 @@ export interface ISettings extends Document {
 const SettingsSchema = new Schema<ISettings>(
   {
     deliveryCharge: { type: Number, default: 0 },
+    deliveryFeePerOrder: { type: Number, default: 50 },
     maintenanceMode: { type: Boolean, default: false },
     storeAddress: { type: String, default: "" },
     storePhone: { type: String, default: "" },

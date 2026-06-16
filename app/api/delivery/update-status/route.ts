@@ -1,5 +1,4 @@
 // app/api/delivery/update-status/route.ts
-// CHANGELOG: Delivery boy updates delivery progress status
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
