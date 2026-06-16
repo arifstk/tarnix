@@ -50,18 +50,18 @@ const STATUS_STEPS: OrderStatus[] = [
 ];
 
 const STATUS_META: Record<OrderStatus, { label: string; icon: string; color: string; bg: string; border: string }> = {
-  pending:    { label: "Pending",    icon: "🕐", color: "text-slate-400",   bg: "bg-slate-400",   border: "border-slate-400"   },
-  confirmed:  { label: "Confirmed",  icon: "✅", color: "text-indigo-400",  bg: "bg-indigo-500",  border: "border-indigo-400"  },
-  processing: { label: "Processing", icon: "⚙️", color: "text-amber-400",   bg: "bg-amber-500",   border: "border-amber-400"   },
-  shipped:    { label: "Shipped",    icon: "🚚", color: "text-sky-400",     bg: "bg-sky-500",     border: "border-sky-400"     },
-  delivered:  { label: "Delivered",  icon: "🎉", color: "text-emerald-400", bg: "bg-emerald-500", border: "border-emerald-400" },
-  cancelled:  { label: "Cancelled",  icon: "✕",  color: "text-rose-400",    bg: "bg-rose-500",    border: "border-rose-400"    },
+  pending: { label: "Pending", icon: "🕐", color: "text-slate-400", bg: "bg-slate-400", border: "border-slate-400" },
+  confirmed: { label: "Confirmed", icon: "✅", color: "text-indigo-400", bg: "bg-indigo-500", border: "border-indigo-400" },
+  processing: { label: "Processing", icon: "⚙️", color: "text-amber-400", bg: "bg-amber-500", border: "border-amber-400" },
+  shipped: { label: "Shipped", icon: "🚚", color: "text-sky-400", bg: "bg-sky-500", border: "border-sky-400" },
+  delivered: { label: "Delivered", icon: "🎉", color: "text-emerald-400", bg: "bg-emerald-500", border: "border-emerald-400" },
+  cancelled: { label: "Cancelled", icon: "✕", color: "text-rose-400", bg: "bg-rose-500", border: "border-rose-400" },
 };
 
 const PAYMENT_META: Record<PaymentStatus, { label: string; color: string }> = {
-  pending: { label: "Pending",  color: "text-amber-400"   },
-  paid:    { label: "Paid",     color: "text-emerald-400" },
-  failed:  { label: "Failed",   color: "text-rose-400"    },
+  pending: { label: "Pending", color: "text-amber-400" },
+  paid: { label: "Paid", color: "text-emerald-400" },
+  failed: { label: "Failed", color: "text-rose-400" },
 };
 
 // ─── Star Rating Input ────────────────────────────────────────
@@ -114,26 +114,24 @@ function StatusTracker({ status }: { status: OrderStatus }) {
 
       <div className="flex items-start justify-between relative gap-2 sm:gap-0">
         {STATUS_STEPS.map((step, idx) => {
-          const meta      = STATUS_META[step];
-          const isDone    = idx < currentIdx;
+          const meta = STATUS_META[step];
+          const isDone = idx < currentIdx;
           const isCurrent = idx === currentIdx;
 
           return (
             <div key={step} className="flex flex-col items-center gap-2 z-10 flex-1">
               {/* Circle */}
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 ${
-                isDone
-                  ? "bg-indigo-500 border-indigo-500 text-white"
-                  : isCurrent
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 ${isDone
+                ? "bg-indigo-500 border-indigo-500 text-white"
+                : isCurrent
                   ? `${meta.bg} ${meta.border} text-white ring-4 ring-white/10`
                   : "bg-slate-800 border-slate-700 text-slate-600"
-              }`}>
+                }`}>
                 {isDone ? "✓" : isCurrent ? meta.icon : idx + 1}
               </div>
               {/* Label */}
-              <p className={`text-xs font-semibold text-center leading-tight ${
-                isCurrent ? meta.color : isDone ? "text-indigo-400" : "text-slate-600"
-              }`}>
+              <p className={`text-xs font-semibold text-center leading-tight ${isCurrent ? meta.color : isDone ? "text-indigo-400" : "text-slate-600"
+                }`}>
                 {meta.label}
               </p>
             </div>
@@ -156,11 +154,11 @@ function ReviewForm({
   existingReview?: Review;
   onSubmitted: (productId: string, rating: number, comment: string) => void;
 }) {
-  const [rating,    setRating]    = useState(existingReview?.rating  || 0);
-  const [comment,   setComment]   = useState(existingReview?.comment || "");
-  const [loading,   setLoading]   = useState(false);
+  const [rating, setRating] = useState(existingReview?.rating || 0);
+  const [comment, setComment] = useState(existingReview?.comment || "");
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(!!existingReview);
-  const [error,     setError]     = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async () => {
     if (!rating) { setError("Please select a star rating."); return; }
@@ -193,7 +191,7 @@ function ReviewForm({
         <div>
           <p className="text-xs font-semibold text-emerald-400">Review submitted</p>
           <div className="flex gap-0.5 mt-0.5">
-            {[1,2,3,4,5].map((s) => (
+            {[1, 2, 3, 4, 5].map((s) => (
               <span key={s} className={`text-xs ${s <= rating ? "text-amber-400" : "text-slate-600"}`}>★</span>
             ))}
           </div>
@@ -231,7 +229,7 @@ function ReviewForm({
 
 // ─── Single Order Card ────────────────────────────────────────
 function OrderCard({ order: initialOrder }: { order: Order }) {
-  const [order,    setOrder]    = useState(initialOrder);
+  const [order, setOrder] = useState(initialOrder);
   const [expanded, setExpanded] = useState(false);
   const meta = STATUS_META[order.orderStatus];
   const isDelivered = order.orderStatus === "delivered";
@@ -275,13 +273,12 @@ function OrderCard({ order: initialOrder }: { order: Order }) {
           </div>
 
           {/* Order status badge */}
-          <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
-            order.orderStatus === "delivered"  ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
-            order.orderStatus === "cancelled"  ? "bg-rose-50 text-rose-600 border-rose-200" :
-            order.orderStatus === "shipped"    ? "bg-sky-50 text-sky-600 border-sky-200" :
-            order.orderStatus === "processing" ? "bg-amber-50 text-amber-600 border-amber-200" :
-                                                 "bg-slate-50 text-slate-600 border-slate-200"
-          }`}>
+          <span className={`text-xs font-bold px-3 py-1 rounded-full border ${order.orderStatus === "delivered" ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
+            order.orderStatus === "cancelled" ? "bg-rose-50 text-rose-600 border-rose-200" :
+              order.orderStatus === "shipped" ? "bg-sky-50 text-sky-600 border-sky-200" :
+                order.orderStatus === "processing" ? "bg-amber-50 text-amber-600 border-amber-200" :
+                  "bg-slate-50 text-slate-600 border-slate-200"
+            }`}>
             {meta.label}
           </span>
 
@@ -391,7 +388,12 @@ function OrderCard({ order: initialOrder }: { order: Order }) {
                 </div>
                 <div className="flex justify-between text-xs text-slate-500">
                   <span>Shipping</span>
-                  <span className="text-emerald-600">Free</span>
+                  {(() => {
+                    const shipping = order.total - order.subtotal;
+                    return shipping > 0
+                      ? <span className="text-slate-700">${shipping.toFixed(2)}</span>
+                      : <span className="text-emerald-600">Free</span>;
+                  })()}
                 </div>
                 <div className="flex justify-between text-sm font-bold text-slate-800 border-t border-slate-200 pt-1.5">
                   <span>Total</span>
@@ -435,9 +437,9 @@ export default function MyOrdersPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [orders,  setOrders]  = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter,  setFilter]  = useState<OrderStatus | "all">("all");
+  const [filter, setFilter] = useState<OrderStatus | "all">("all");
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
@@ -456,12 +458,12 @@ export default function MyOrdersPage() {
     : orders.filter((o) => o.orderStatus === filter);
 
   const filterTabs: { label: string; value: OrderStatus | "all" }[] = [
-    { label: "All",        value: "all"        },
-    { label: "Pending",    value: "pending"     },
-    { label: "Processing", value: "processing"  },
-    { label: "Shipped",    value: "shipped"     },
-    { label: "Delivered",  value: "delivered"   },
-    { label: "Cancelled",  value: "cancelled"   },
+    { label: "All", value: "all" },
+    { label: "Pending", value: "pending" },
+    { label: "Processing", value: "processing" },
+    { label: "Shipped", value: "shipped" },
+    { label: "Delivered", value: "delivered" },
+    { label: "Cancelled", value: "cancelled" },
   ];
 
   if (status === "loading") return null;
@@ -484,17 +486,15 @@ export default function MyOrdersPage() {
             <button
               key={tab.value}
               onClick={() => setFilter(tab.value)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                filter === tab.value
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "bg-white text-slate-500 border border-slate-200 hover:border-indigo-300 hover:text-indigo-500"
-              }`}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${filter === tab.value
+                ? "bg-indigo-600 text-white shadow-sm"
+                : "bg-white text-slate-500 border border-slate-200 hover:border-indigo-300 hover:text-indigo-500"
+                }`}
             >
               {tab.label}
               {tab.value !== "all" && orders.filter((o) => o.orderStatus === tab.value).length > 0 && (
-                <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
-                  filter === tab.value ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                }`}>
+                <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${filter === tab.value ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+                  }`}>
                   {orders.filter((o) => o.orderStatus === tab.value).length}
                 </span>
               )}
@@ -532,7 +532,6 @@ export default function MyOrdersPage() {
             ))
           )}
         </div>
-
       </div>
     </main>
   );

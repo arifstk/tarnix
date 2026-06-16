@@ -418,7 +418,12 @@ export default function OrdersSection() {
               </div>
               <div className="flex justify-between text-xs text-slate-400">
                 <span>Shipping</span>
-                <span className="text-emerald-400">Free</span>
+                {(() => {
+                  const shipping = viewOrder.total - viewOrder.subtotal;
+                  return shipping > 0
+                    ? <span className="text-white">${shipping.toFixed(2)}</span>
+                    : <span className="text-emerald-400">Free</span>;
+                })()}
               </div>
               <div className="flex justify-between text-sm font-bold text-white pt-1">
                 <span>Total</span>

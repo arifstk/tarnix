@@ -143,7 +143,7 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between text-base font-bold text-gray-800 border-t border-gray-100 pt-4 mb-6">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>${grandTotal.toFixed(2)}</span>
               </div>
 
               <Link href="/checkout">
