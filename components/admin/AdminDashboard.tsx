@@ -10,6 +10,7 @@ import ProductsSection from "./ProductsSection";
 import CategoriesSection from "./CategoriesSection";
 import OrdersSection from "./OrdersSection";
 import OverviewSection from "./OverviewSection";
+import UsersSection from "./UserSection";
 
 // ─── Types ────────────────────────────────────────────────────
 type Role = "user" | "admin" | "deliveryBoy";
@@ -283,7 +284,7 @@ export default function AdminDashboard() {
           {section === "overview" && (<OverviewSection />)}
 
           {/* ══ USERS ═════════════════════════════════════════ */}
-          {section === "users" && (
+          {/* {section === "users" && (
             <div className="max-w-6xl space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -332,7 +333,8 @@ export default function AdminDashboard() {
                 </div>
               </Card>
             </div>
-          )}
+          )} */}
+          {section === "users" && <UsersSection /> }
 
           {/* ══ PRODUCTS ══════════════════════════════════════ */}
           {section === "products" && <ProductsSection />}
