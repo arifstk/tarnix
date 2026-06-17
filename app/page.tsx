@@ -10,6 +10,8 @@ const Home = () => {
       <h2 className='text-4xl text-gray-800 font-bold pt-15 text-center'>Featured Products</h2>
       <div>
         <Products />
+        {/* fetch best selling products */}
+        <div> </div>
       </div>
     </div>
   )

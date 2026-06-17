@@ -48,7 +48,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full overflow-hidden rounded-4xl">
+    <section className="relative w-full overflow-hidden rounded-lg">
       <div className="relative h-105 w-full md:h-130">
         <AnimatePresence mode="wait">
           <motion.div

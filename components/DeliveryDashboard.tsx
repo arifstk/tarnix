@@ -226,12 +226,12 @@ export default function DeliveryDashboard() {
           <div className="pl-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">🛵</span>
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 animate-pulse">
                 On Duty
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Good day, {firstName}! 👋
+              Hi, {firstName} ! 👋
             </h1>
             <p className="text-slate-400 text-sm mt-1.5">
               {inProgress > 0
