@@ -9,8 +9,14 @@ const NAV_LINKS = [
   { href: "/about", label: "About Us" },
 ];
 
-const UserNav = () => {
+type UserNavProps = {
+  role: "user" | "admin" | "deliveryBoy" | null;
+}
+
+const UserNav = ({ role }: UserNavProps) => {
   const pathname = usePathname();
+  if (role === "admin" || role === "deliveryBoy") return null;
+
   return (
     <nav className="hidden md:flex items-center gap-6">
       {NAV_LINKS.map((link) => {

@@ -51,7 +51,7 @@ const Header = ({ role }: NavbarProps) => {
         </div>
 
         {/* ── CENTER: Nav ── */}
-        <UserNav />
+        <UserNav role= {role}/>
 
         {/* ── RIGHT: Auth (all roles) ── */}
         <div className="shrink-0 flex items-center gap-2">

@@ -111,7 +111,7 @@ const SkeletonRow = () => (
   >
     {Array.from({ length: 6 }).map((_, i) => (
       <td key={i} className="px-5 py-4">
-        <div className="h-3 bg-white/[0.05] rounded-full w-full" />
+        <div className="h-3 bg-white/5 rounded-full w-full" />
       </td>
     ))}
   </tr>
@@ -279,7 +279,7 @@ export default function UsersSection() {
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="px-3 py-2 rounded-xl bg-white/[0.05] text-slate-400 hover:text-white text-sm border border-white/[0.07] transition-all"
+            className="px-3 py-2 rounded-xl bg-white/5 text-slate-400 hover:text-white text-sm border border-white/[0.07] transition-all"
           >
             Clear ✕
           </button>
@@ -319,7 +319,7 @@ export default function UsersSection() {
                 filtered.map((u) => (
                   <tr
                     key={u._id}
-                    className="border-b hover:bg-white/[0.02] transition-colors"
+                    className="border-b hover:bg-white/2 transition-colors"
                     style={{ borderColor: "rgba(255,255,255,0.03)" }}
                   >
                     {/* User */}
@@ -334,7 +334,7 @@ export default function UsersSection() {
                           />
                         ) : (
                           <div
-                            className={`w-8 h-8 rounded-full bg-gradient-to-br ${avatarColor(u.name)} flex items-center justify-center text-xs font-black text-white shrink-0`}
+                            className={`w-8 h-8 rounded-full bg-linear-to-br ${avatarColor(u.name)} flex items-center justify-center text-xs font-black text-white shrink-0`}
                           >
                             {u.avatar}
                           </div>
@@ -376,7 +376,7 @@ export default function UsersSection() {
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => { setEditModal(u); setEditRole(u.role); }}
-                          className="px-2.5 py-1 rounded-xl text-xs font-semibold bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.08] transition-all active:scale-95"
+                          className="px-2.5 py-1 rounded-xl text-xs font-semibold bg-white/6 hover:bg-white/10 text-slate-300 border border-white/8 transition-all active:scale-95"
                         >
                           Edit
                         </button>
@@ -436,7 +436,7 @@ export default function UsersSection() {
                 />
               ) : (
                 <div
-                  className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColor(editModal.name)} flex items-center justify-center text-sm font-black text-white`}
+                  className={`w-10 h-10 rounded-full bg-linear-to-br ${avatarColor(editModal.name)} flex items-center justify-center text-sm font-black text-white`}
                 >
                   {editModal.avatar}
                 </div>
@@ -461,8 +461,8 @@ export default function UsersSection() {
                     key={r}
                     onClick={() => setEditRole(r)}
                     className={`py-2.5 rounded-xl text-xs font-bold border transition-all ${editRole === r
-                        ? roleColors[r] + " ring-2 ring-white/20"
-                        : "bg-white/[0.03] text-slate-500 border-white/[0.07] hover:border-white/20"
+                      ? roleColors[r] + " ring-2 ring-white/20"
+                      : "bg-white/3 text-slate-500 border-white/[0.07] hover:border-white/20"
                       }`}
                   >
                     {r === "deliveryBoy" ? "Delivery Boy" : r.charAt(0).toUpperCase() + r.slice(1)}
@@ -482,7 +482,7 @@ export default function UsersSection() {
               </button>
               <button
                 onClick={() => setEditModal(null)}
-                className="flex-1 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.08] text-sm font-semibold transition-all"
+                className="flex-1 py-2.5 rounded-xl bg-white/6 hover:bg-white/10 text-slate-300 border border-white/8 text-sm font-semibold transition-all"
               >
                 Cancel
               </button>
