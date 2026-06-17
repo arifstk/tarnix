@@ -25,7 +25,7 @@ const UserNav = ({ role }: UserNavProps) => {
           <Link
             key={link.href}
             href={link.href}
-            className={`relative group text-sm text-blue-600 font-medium transition-colors duration-200 py-1 ${active ? "text-blue-500" : "hover:text-gray-800"
+            className={`relative group text-sm text-gray-800 font-medium transition-colors duration-200 py-1 ${active ? "text-blue-500" : "hover:text-gray-800"
               }`}
           >
             {link.label}

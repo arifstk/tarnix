@@ -22,10 +22,11 @@ const Header = ({ role }: NavbarProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isAdmin = role === "admin";
   const isDeliveryBoy = role === "deliveryBoy";
+  const isUser = role === "user";
 
   const cartCount = useSelector((s: RootState) =>
-  s.cart.items.reduce((sum, item) => sum + item.quantity, 0)
-);
+    s.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md shadow-[0_1px_30px_rgba(0,0,0,0.4)] border-b border-white/20">
@@ -51,20 +52,10 @@ const Header = ({ role }: NavbarProps) => {
         </div>
 
         {/* ── CENTER: Nav ── */}
-        <UserNav role= {role}/>
+        <UserNav role={role} />
 
         {/* ── RIGHT: Auth (all roles) ── */}
         <div className="shrink-0 flex items-center gap-2">
-
-          {/* Admin badge */}
-          {/* {isAdmin && (
-            <Link
-              href="/admin/dashboard"
-              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-semibold hover:bg-violet-600/30 transition-all duration-200"
-            >
-              Admin
-            </Link>
-          )} */}
 
           {/* Admin badge (desktop only) */}
           {isAdmin && (
@@ -93,16 +84,18 @@ const Header = ({ role }: NavbarProps) => {
           )}
 
           {/* Cart Icon */}
-          <Link
-            href="/cart"
-            className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-200"
-          >
-            <ShoppingCart className="w-5 h-5 text-indigo-600" />
-            {/* Badge for item count */}
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow">
-              {cartCount > 99 ? "99+" : cartCount}
-            </span>
-          </Link>
+          {isUser && (
+            <Link
+              href="/cart"
+              className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-200"
+            >
+              <ShoppingCart className="w-5 h-5 text-indigo-600" />
+              {/* Badge for item count */}
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            </Link>
+          )}
 
           {session?.user ? (
             <div className="relative" ref={dropdownRef}>
