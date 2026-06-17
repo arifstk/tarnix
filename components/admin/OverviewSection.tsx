@@ -164,7 +164,7 @@ export default function OverviewSection() {
   const maxOrders = Math.max(...weeklyOrders.map((d) => d.orders), 1);
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6">
 
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">

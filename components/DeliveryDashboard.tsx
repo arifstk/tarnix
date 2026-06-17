@@ -76,12 +76,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-// ─── Skeleton ─────────────────────────────────────────────────
+// ─── Skeleton ───────────────────────────────────
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-white/5 rounded-xl ${className}`} />
 );
 
-// ═══════════════════════════════════════════════════════════════
+// Main ════════════════════════════════════════════
 export default function DeliveryDashboard() {
   const { data: session } = useSession();
 
@@ -203,15 +203,14 @@ export default function DeliveryDashboard() {
   return (
     <div
       className="min-h-screen bg-[#0d1117] text-white"
-      style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif" }}
-    >
+      style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif" }}>
       {/* ── Ambient bg ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-32 -left-20 w-125 h-125 rounded-full bg-amber-500/5 blur-[120px]" />
         <div className="absolute bottom-0 right-0 w-100 h-100 rounded-full bg-sky-500/5 blur-[100px]" />
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <div className="relative px-2 md:px-4 py-8 space-y-6">
 
         {/* ════ GREETING BANNER ════ */}
         <div
