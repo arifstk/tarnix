@@ -4,13 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
-import { AiOutlineProduct } from "react-icons/ai";
-import { TbCategoryPlus } from "react-icons/tb";
+
 
 const USER_NAV_LINKS = [
   { href: "/", label: "Home" },
+  { href: "/newArrival", label: "New Arrival" },
   { href: "/shop", label: "Shop" },
-  { href: "/hot-deals", label: "Hot Deals" },
   { href: "/about", label: "About Us" },
 ];
 
@@ -66,7 +65,7 @@ const MobileNav = ({ role }: MobileNavProps) => {
       {/* ── Sidebar ── */}
       <div
         ref={sidebarRef}
-        className={`fixed top-17 left-0 w-72 h-[calc(100vh-4.25rem)] bg-white shadow-2xl border-r border-slate-100/80 z-50 md:hidden flex flex-col transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-14 left-0 w-72 h-[calc(100vh-4.25rem)] bg-white shadow-2xl border-r border-slate-100/80 z-50 md:hidden flex flex-col transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* Nav links — dynamically scrollable */}
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
@@ -87,9 +86,9 @@ const MobileNav = ({ role }: MobileNavProps) => {
                       }`}
                   >
                     {link.label}
-                    {link.label === "Hot Deals" && (
+                    {link.label === "New Arrival" && (
                       <span className="ml-auto text-[10px] font-bold bg-rose-500 text-white px-2 py-0.5 rounded-full animate-pulse">
-                        HOT
+                        NEW
                       </span>
                     )}
                   </Link>

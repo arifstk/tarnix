@@ -4,8 +4,8 @@ import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
+  { href: "/newArrival", label: "New Arrival" },
   { href: "/shop", label: "Shop" },
-  { href: "/hot-deals", label: "Hot Deals" },
   { href: "/about", label: "About Us" },
 ];
 
@@ -29,9 +29,9 @@ const UserNav = ({ role }: UserNavProps) => {
               }`}
           >
             {link.label}
-            {link.label === "Hot Deals" && (
+            {link.label === "New Arrival" && (
               <span className="absolute -top-2 -right-3 text-xs bg-rose-500 text-white px-1 rounded-full tracking-tighter">
-                HOT
+                NEW
               </span>
             )}
             <span className={`absolute -bottom-0.5 right-1/2 h-0.5 bg-indigo-400 transition-all duration-300 ease-out ${active ? "w-1/2" : "w-0 group-hover:w-1/2"}`} />

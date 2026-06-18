@@ -219,8 +219,8 @@ interface TopSellingProductsProps {
 }
 
 export default function TopSellingProducts({
-  limit = 8,
-  title = "Top Selling Products",
+  limit = 16,
+  title = "Best Selling Products",
   showSubtitle = true,
 }: TopSellingProductsProps) {
   const [products, setProducts] = useState<TopProduct[]>([]);

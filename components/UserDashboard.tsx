@@ -17,8 +17,7 @@ const UserDashboard = () => {
       </div>
       {/* <ProductsPage /> */}
       <TopSellingProducts />
-      <TopRatedProducts limit={20} />
-      <NewArrivals layout="grid" limit={20} />
+      <TopRatedProducts />
     </div>
   )
 }

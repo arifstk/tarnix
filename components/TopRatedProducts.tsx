@@ -243,6 +243,7 @@ function RatedProductCard({
 // MAIN EXPORT — drop anywhere
 // ═══════════════════════════════════════════════════════════════
 interface TopRatedProductsProps {
+  layout?: "scroll" | "grid";
   limit?: number;
   minRatings?: number; // minimum reviews needed to qualify
   title?: string;

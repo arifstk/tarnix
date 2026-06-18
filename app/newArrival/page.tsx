@@ -1,9 +1,10 @@
+import NewArrivals from '@/components/NewArrivals'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      hot-deals page content
+      <NewArrivals layout="grid"/>
     </div>
   )
 }
