@@ -6,7 +6,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-white text-zinc-900 border-t border-zinc-100">
-      <div className="max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="w-[96%] md:w-[90%] mx-auto px-3 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
 
         {/* Brand Column */}
         <div className="space-y-4">
@@ -18,24 +18,13 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Shop Links */}
-        {/* <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">Shop</h4>
-          <ul className="space-y-2.5 text-sm text-zinc-600">
-            <li><Link href="/new-arrivals" className="hover:text-zinc-900 transition-colors">New Arrivals</Link></li>
-            <li><Link href="/collections" className="hover:text-zinc-900 transition-colors">Collections</Link></li>
-            <li><Link href="/mens" className="hover:text-zinc-900 transition-colors">Menswear</Link></li>
-            <li><Link href="/womens" className="hover:text-zinc-900 transition-colors">Womenswear</Link></li>
-          </ul>
-        </div> */}
-
         {/* Support Links */}
         <div>
           <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">Assistance</h4>
           <ul className="space-y-2.5 text-sm text-zinc-600">
-            <li><Link href="/shipping" className="hover:text-zinc-900 transition-colors">Delivery & Returns</Link></li>
-            <li><Link href="/track" className="hover:text-zinc-900 transition-colors">Track Order</Link></li>
-            <li><Link href="/about" className="hover:text-zinc-900 transition-colors">Our Story</Link></li>
+            <li><Link href="/shipping-policy" className="hover:text-zinc-900 transition-colors">Delivery & Returns</Link></li>
+            <li><Link href="/my-orders" className="hover:text-zinc-900 transition-colors">Track Order</Link></li>
+            <li><Link href="/story" className="hover:text-zinc-900 transition-colors">Our Story</Link></li>
             <li><Link href="/contact" className="hover:text-zinc-900 transition-colors">Contact Us</Link></li>
           </ul>
         </div>
