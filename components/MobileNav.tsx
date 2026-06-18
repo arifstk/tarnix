@@ -72,7 +72,6 @@ const MobileNav = ({ role }: MobileNavProps) => {
 
           {(role === "user" || role === null) && (
             <>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider px-3 pb-2">Menu</p>
               {USER_NAV_LINKS.map((link) => {
                 const active = pathname === link.href;
                 return (
