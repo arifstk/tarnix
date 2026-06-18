@@ -81,7 +81,7 @@ export default function ProductsPage() {
     });
 
   const hasFilters = search !== "" || category !== "all";
-  const pageSize = 12;
+  const pageSize = 16;
   const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);
 
@@ -227,14 +227,14 @@ export default function ProductsPage() {
         )}
 
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
             {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         )}
 
         {/* Product Grid — passes addedId so card can show "Added!" flash */}
         {!loading && filtered.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-10">
             {paginated.map((product) => (
               <ProductCard
                 key={product._id}

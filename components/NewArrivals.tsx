@@ -52,20 +52,26 @@ function newBadgeColor(days: number): string {
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────
-const SkeletonCard = () => (
-  <div className="rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm animate-pulse shrink-0 w-48 sm:w-56">
+const SkeletonCard = ({ fixedWidth = true }: { fixedWidth?: boolean }) => (
+  <div className={`rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm animate-pulse ${fixedWidth ? "shrink-0 w-48 sm:w-56" : "w-full"}`}>
     <div className="aspect-4/3 bg-slate-200" />
-    <div className="p-4 space-y-3">
+    <div className="p-4 space-y-2">
       <div className="h-3 w-1/3 bg-slate-200 rounded-full" />
       <div className="h-4 w-4/5 bg-slate-200 rounded-full" />
       <div className="h-3 w-1/2 bg-slate-200 rounded-full" />
-      <div className="h-9 bg-slate-100 rounded-xl mt-2" />
+      <div className="h-8 bg-slate-100 rounded-xl mt-1" />
     </div>
   </div>
 );
 
 // ─── Single Card ──────────────────────────────────────────────
-function NewProductCard({ item }: { item: NewProduct }) {
+function NewProductCard({
+  item,
+  fixedWidth = true,
+}: {
+  item: NewProduct;
+  fixedWidth?: boolean; // true = horizontal scroll sizing, false = fill grid cell
+}) {
   const dispatch = useDispatch();
   const { product } = item;
 
@@ -95,7 +101,10 @@ function NewProductCard({ item }: { item: NewProduct }) {
   };
 
   return (
-    <div className="rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col shrink-0 w-48 sm:w-56">
+    <div
+      className={`rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col ${fixedWidth ? "shrink-0 w-48 sm:w-56" : "w-full"
+        }`}
+    >
 
       {/* ── Image ── */}
       <div className="relative aspect-4/3 bg-slate-100">
@@ -105,8 +114,7 @@ function NewProductCard({ item }: { item: NewProduct }) {
               src={imageSrc}
               alt={product.name}
               fill
-              className={`object-cover transition-transform duration-300 hover:scale-105 ${isOutOfStock ? "opacity-50" : ""
-                }`}
+              className={`object-cover ${isOutOfStock ? "opacity-50" : ""}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-slate-300 text-4xl">
@@ -116,14 +124,14 @@ function NewProductCard({ item }: { item: NewProduct }) {
         </Link>
 
         {/* NEW badge — top left */}
-        <div className="absolute top-2 left-2 flex items-center gap-1">
-          <span className={`text-[10px] font-black text-white px-2 py-0.5 rounded-full shadow ${newBadgeColor(item.daysAgo)}`}>
+        <div className="absolute top-2.5 left-2.5 flex items-center gap-1">
+          <span className={`text-[10px] font-bold text-white px-2 py-1 rounded-full shadow-sm ${newBadgeColor(item.daysAgo)}`}>
             NEW
           </span>
         </div>
 
         {/* Days ago — below NEW badge */}
-        <div className="absolute top-7 left-2">
+        <div className="absolute top-9 left-2.5">
           <span className="text-[9px] font-semibold bg-black/40 text-white px-1.5 py-0.5 rounded-full backdrop-blur-sm">
             {daysAgoLabel(item.daysAgo)}
           </span>
@@ -131,7 +139,7 @@ function NewProductCard({ item }: { item: NewProduct }) {
 
         {/* Discount badge — top right */}
         {hasDiscount && (
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-2.5 right-2.5">
             <span className="text-xs font-bold px-2 py-1 rounded-full bg-rose-500 text-white shadow-sm">
               -{product.discountRate}%
             </span>
@@ -149,7 +157,7 @@ function NewProductCard({ item }: { item: NewProduct }) {
       </div>
 
       {/* ── Body ── */}
-      <div className="p-3 flex flex-col flex-1 gap-1">
+      <div className="p-4 flex flex-col flex-1 gap-1">
 
         {/* Category */}
         <p className="text-xs text-indigo-500 font-semibold uppercase tracking-wide truncate">
@@ -158,29 +166,24 @@ function NewProductCard({ item }: { item: NewProduct }) {
 
         {/* Name */}
         <Link href={`/products/${product._id}`}>
-          <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 leading-snug hover:text-indigo-600 transition-colors">
+          <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 leading-snug">
             {product.name}
           </h3>
         </Link>
 
         {/* Rating */}
         {product.rating > 0 && (
-          <div className="flex items-center gap-1">
-            <span className="text-amber-400 text-xs">★</span>
-            <span className="text-xs font-semibold text-slate-600">
-              {product.rating.toFixed(1)}
-            </span>
+          <p className="text-xs text-amber-500 font-medium">
+            ★ {product.rating.toFixed(1)}
             {product.ratingCount > 0 && (
-              <span className="text-xs text-slate-400">
-                ({product.ratingCount})
-              </span>
+              <span className="text-slate-400 font-normal"> ({product.ratingCount})</span>
             )}
-          </div>
+          </p>
         )}
 
         {/* Stock + sold */}
-        <div className="flex items-center justify-between mt-0.5">
-          <div className="flex items-center gap-1">
+        <div className="flex items-center justify-between gap-2 mt-1">
+          <div className="flex items-center gap-1.5">
             <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isOutOfStock ? "bg-rose-500" : isLowStock ? "bg-amber-400" : "bg-emerald-500"
               }`} />
             <span className={`text-xs font-medium ${isOutOfStock ? "text-rose-500" : isLowStock ? "text-amber-500" : "text-slate-400"
@@ -194,15 +197,15 @@ function NewProductCard({ item }: { item: NewProduct }) {
           </div>
 
           {item.totalSold > 0 && (
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full shrink-0">
               ↑{item.totalSold}
             </span>
           )}
         </div>
 
         {/* Price */}
-        <div className="flex items-center gap-1.5 mt-auto pt-1">
-          <span className="text-sm font-black text-indigo-600">
+        <div className="flex items-center gap-2 mt-auto pt-2">
+          <span className="text-base font-bold text-indigo-600">
             ${displayPrice.toFixed(2)}
           </span>
           {hasDiscount && (
@@ -216,7 +219,7 @@ function NewProductCard({ item }: { item: NewProduct }) {
         <button
           onClick={handleAddToCart}
           disabled={isOutOfStock || isAdded}
-          className={`mt-1 w-full py-2 rounded-xl text-xs font-bold active:scale-95 transition-all ${isOutOfStock
+          className={`mt-2 w-full py-2 rounded-xl text-sm font-semibold active:scale-95 transition-all ${isOutOfStock
             ? "bg-slate-100 text-slate-400 cursor-not-allowed"
             : isAdded
               ? "bg-emerald-500 text-white cursor-not-allowed"
@@ -274,7 +277,7 @@ export default function NewArrivals({
     <section className="py-10">
 
       {/* ── Header ── */}
-      <div className="flex items-end justify-between mb-6 gap-4">
+      <div className="flex items-center justify-between mb-6 gap-2">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl">✨</span>
@@ -331,7 +334,7 @@ export default function NewArrivals({
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {loading
-            ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+            ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} fixedWidth />)
             : products.length === 0
               ? (
                 <div className="w-full text-center py-16">
@@ -342,24 +345,17 @@ export default function NewArrivals({
                 </div>
               )
               : products.map((item) => (
-                <NewProductCard key={item.product._id} item={item} />
+                <NewProductCard key={item.product._id} item={item} fixedWidth />
               ))}
         </div>
       )}
 
       {/* ── Grid layout ── */}
       {layout === "grid" && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-10">
           {loading
             ? Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm animate-pulse">
-                <div className="aspect-4/3 bg-slate-200" />
-                <div className="p-4 space-y-3">
-                  <div className="h-3 w-1/3 bg-slate-200 rounded-full" />
-                  <div className="h-4 w-4/5 bg-slate-200 rounded-full" />
-                  <div className="h-9 bg-slate-100 rounded-xl mt-2" />
-                </div>
-              </div>
+              <SkeletonCard key={i} fixedWidth={false} />
             ))
             : products.length === 0
               ? (
@@ -371,7 +367,7 @@ export default function NewArrivals({
                 </div>
               )
               : products.map((item) => (
-                <NewProductCard key={item.product._id} item={item} />
+                <NewProductCard key={item.product._id} item={item} fixedWidth={false} />
               ))}
         </div>
       )}

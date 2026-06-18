@@ -97,7 +97,7 @@ function TopProductCard({
       className="group relative rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
     >
       {/* ── Image ── */}
-      <div className="relative aspect-square overflow-hidden bg-slate-50">
+      <div className="relative aspect-4/3 overflow-hidden bg-slate-50">
         {imageSrc ? (
           <Image
             src={imageSrc}
@@ -242,7 +242,7 @@ export default function TopSellingProducts({
     <section className="py-10">
 
       {/* ── Section header ── */}
-      <div className="flex items-end justify-between mb-6 gap-4">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-2">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl">🔥</span>
@@ -273,7 +273,7 @@ export default function TopSellingProducts({
       )}
 
       {/* ── Grid ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-10">
         {loading
           ? Array.from({ length: limit > 5 ? 5 : limit }).map((_, i) => (
             <SkeletonCard key={i} />

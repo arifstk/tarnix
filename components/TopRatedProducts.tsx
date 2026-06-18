@@ -274,7 +274,7 @@ export default function TopRatedProducts({
     <section className="py-10">
 
       {/* Header */}
-      <div className="flex items-end justify-between mb-6 gap-4">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-2">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xl">⭐</span>
@@ -284,7 +284,7 @@ export default function TopRatedProducts({
           </div>
           {showSubtitle && (
             <p className="text-sm text-slate-400">
-              Highest rated by verified buyers — real reviews only
+              Highest rated by verified buyers — reviews only
             </p>
           )}
         </div>
@@ -304,7 +304,7 @@ export default function TopRatedProducts({
       )}
 
       {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-10">
         {loading ? (
           Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)
         ) : products.length === 0 && !error ? (
