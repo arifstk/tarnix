@@ -1,7 +1,7 @@
 // app/contact/page.tsx
 
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -24,13 +24,24 @@ export default function ContactPage() {
   const { data: session } = useSession();
 
   const [form, setForm] = useState({
-    name: session?.user?.name || "",
-    email: session?.user?.email || "",
+    name: "",
+    email: "",
     subject: "",
     message: "",
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  // Sync session data once it arrives
+  useEffect(() => {
+    if (session?.user) {
+      setForm((p) => ({
+        ...p,
+        name: p.name || session.user?.name || "",
+        email: p.email || session.user?.email || "",
+      }));
+    }
+  }, [session]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -62,6 +73,27 @@ export default function ContactPage() {
       setLoading(false);
     }
   };
+
+  // Store info from admin panel
+  const [storeSettings, setStoreSettings] = useState<{
+    storeEmail: string;
+    storePhone: string;
+    storeAddress: string;
+    facebook: string;
+    instagram: string;
+    twitter: string;
+    youtube: string;
+  } | null>(null);
+
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) setStoreSettings(data.settings);
+      })
+      .finally(() => setSettingsLoading(false));
+  }, []);
 
   // ── Success state ──
   if (submitted) {
@@ -102,183 +134,225 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="min-h-screen py-10">
-      <div className='px-1'>
+    <main className="min-h-screen py-10 max-w-7xl mx-auto px-1.5">
+      {/* ── Page header ── */}
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold px-2 py-1.5 rounded-full mb-4">
+          💬 Get in Touch
+        </div>
+        <h1 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight mb-3">
+          Contact Us
+        </h1>
+        <p className="text-slate-400 text-sm max-w-md mx-auto">
+          Have a question, feedback, or need help? We'd love to hear from you.
+          We typically respond within 24 hours.
+        </p>
+      </div>
 
-        {/* ── Page header ── */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold px-2 py-1.5 rounded-full mb-4">
-            💬 Get in Touch
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight mb-3">
-            Contact Us
-          </h1>
-          <p className="text-slate-400 text-sm max-w-md mx-auto">
-            Have a question, feedback, or need help? We'd love to hear from you.
-            We typically respond within 24 hours.
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* ── LEFT: Info cards ── */}
+        <div className="space-y-4">
+          {settingsLoading ? (
+            // Skeleton
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-md border border-slate-100 shadow-sm p-5 flex items-start gap-4 animate-pulse"
+              >
+                <div className="w-10 h-10 rounded-md bg-slate-200 shrink-0" />
+                <div className="flex-1 space-y-2 pt-1">
+                  <div className="h-2.5 w-1/3 bg-slate-200 rounded-md" />
+                  <div className="h-3.5 w-2/3 bg-slate-200 rounded-md" />
+                  <div className="h-2.5 w-1/2 bg-slate-100 rounded-md" />
+                </div>
+              </div>
+            ))
+          ) : (
+            <>
+              {/* Info cards */}
+              {[
+                {
+                  icon: "📧",
+                  title: "Email Us",
+                  desc: storeSettings?.storeEmail || "—",
+                  sub: "We reply within 24 hours",
+                },
+                {
+                  icon: "📞",
+                  title: "Call Us",
+                  desc: storeSettings?.storePhone || "—",
+                  sub: "Mon–Sat, 9am–6pm",
+                },
+                {
+                  icon: "📍",
+                  title: "Visit Us",
+                  desc: storeSettings?.storeAddress || "—",
+                  sub: "Come say hello",
+                },
+                {
+                  icon: "⏱",
+                  title: "Response Time",
+                  desc: "Within 24 hours",
+                  sub: "Usually much faster",
+                },
+              ].map((info) => (
+                <div
+                  key={info.title}
+                  className="bg-white rounded-md border border-slate-100 shadow-sm p-5 flex items-start gap-4"
+                >
+                  <div className="w-10 h-10 rounded-md bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl shrink-0">
+                    {info.icon}
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      {info.title}
+                    </p>
+                    <p className="text-sm font-bold text-slate-800 mt-0.5">
+                      {info.desc}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5">{info.sub}</p>
+                  </div>
+                </div>
+              ))}
+
+              {/* Social links — only if set by admin */}
+              {(() => {
+                const socials = [
+                  { label: "Facebook", href: storeSettings?.facebook, color: "bg-blue-50 text-blue-600 border-blue-100" },
+                  { label: "Instagram", href: storeSettings?.instagram, color: "bg-pink-50 text-pink-600 border-pink-100" },
+                  { label: "Twitter", href: storeSettings?.twitter, color: "bg-sky-50 text-sky-600 border-sky-100" },
+                  { label: "YouTube", href: storeSettings?.youtube, color: "bg-rose-50 text-rose-600 border-rose-100" },
+                ].filter((s) => s.href && s.href.trim() !== "");
+
+                if (socials.length === 0) return null;
+
+                return (
+                  <div className="bg-white rounded-md border border-slate-100 shadow-sm p-5">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                      Follow Us
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {socials.map((s) => (
+                        <a
+                          key={s.label}
+                          href={s.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`flex-1 min-w-20 py-2 rounded-md border text-xs font-bold text-center transition-all hover:opacity-80 ${s.color}`}
+                        >
+                          {s.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-          {/* ── LEFT: Info cards ── */}
-          <div className="space-y-4">
-            {[
-              {
-                icon: "📧",
-                title: "Email Us",
-                desc: "support@tarnix.com",
-                sub: "We reply within 24 hours",
-              },
-              {
-                icon: "📞",
-                title: "Call Us",
-                desc: "+880 1700-000000",
-                sub: "Mon–Sat, 9am–6pm",
-              },
-              {
-                icon: "📍",
-                title: "Visit Us",
-                desc: "12 Commerce St, Dhaka",
-                sub: "Bangladesh 1200",
-              },
-              {
-                icon: "⏱",
-                title: "Response Time",
-                desc: "Within 24 hours",
-                sub: "Usually much faster",
-              },
-            ].map((info) => (
-              <div
-                key={info.title}
-                className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-start gap-4"
-              >
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl shrink-0">
-                  {info.icon}
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    {info.title}
-                  </p>
-                  <p className="text-sm font-bold text-slate-800 mt-0.5">
-                    {info.desc}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-0.5">{info.sub}</p>
-                </div>
-              </div>
-            ))}
-
-            {/* Social links */}
-            {/* <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-            </div> */}
-          </div>
-
-          {/* ── RIGHT: Form ── */}
-          <div className="md:col-span-2">
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-3 md:p-6 space-y-5">
-              <div>
-                <h2 className="text-lg font-black text-slate-800">
-                  Send a Message
-                </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Fill in the form below and we'll get back to you.
-                </p>
-              </div>
-
-              {/* Name + Email */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1.5">
-                    Full Name <span className="text-rose-400">*</span>
-                  </label>
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="John Doe"
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1.5">
-                    Email Address <span className="text-rose-400">*</span>
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="john@example.com"
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              {/* Subject */}
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1.5">
-                  Subject <span className="text-rose-400">*</span>
-                </label>
-                <select
-                  name="subject"
-                  value={form.subject}
-                  onChange={handleChange}
-                  className={inputClass}
-                >
-                  <option value="">Select a subject…</option>
-                  {SUBJECTS.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Message */}
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1.5">
-                  Message <span className="text-rose-400">*</span>
-                </label>
-                <textarea
-                  name="message"
-                  value={form.message}
-                  onChange={handleChange}
-                  placeholder="Tell us how we can help you…"
-                  rows={6}
-                  className={`${inputClass} resize-none`}
-                />
-                <p className="text-xs text-slate-400 mt-1 text-right">
-                  {form.message.length} characters
-                </p>
-              </div>
-
-              {/* Submit */}
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                    </svg>
-                    Sending…
-                  </>
-                ) : (
-                  <>
-                    Send Message 📨
-                  </>
-                )}
-              </button>
-
-              <p className="text-xs text-slate-400 text-center tracking-tighter">
-                🔒 Your information is private and will never be shared.
+        {/* ── RIGHT: Form ── */}
+        <div className="md:col-span-2">
+          <div className="bg-white rounded-md border border-slate-100 shadow-sm p-3 md:p-6 space-y-5">
+            <div>
+              <h2 className="text-lg font-black text-slate-800">
+                Send a Message
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Fill in the form below and we'll get back to you.
               </p>
             </div>
+
+            {/* Name + Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-1.5">
+                  Full Name <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="John Doe"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-1.5">
+                  Email Address <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="john@example.com"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {/* Subject */}
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-1.5">
+                Subject <span className="text-rose-400">*</span>
+              </label>
+              <select
+                name="subject"
+                value={form.subject}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">Select a subject…</option>
+                {SUBJECTS.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Message */}
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-1.5">
+                Message <span className="text-rose-400">*</span>
+              </label>
+              <textarea
+                name="message"
+                value={form.message}
+                onChange={handleChange}
+                placeholder="Tell us how we can help you…"
+                rows={6}
+                className={`${inputClass} resize-none`}
+              />
+              <p className="text-xs text-slate-400 mt-1 text-right">
+                {form.message.length} characters
+              </p>
+            </div>
+
+            {/* Submit */}
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full py-3.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                  Sending…
+                </>
+              ) : (
+                <>Send Message 📨</>
+              )}
+            </button>
+
+            <p className="text-xs text-slate-400 text-center tracking-tighter">
+              🔒 Your information is private and will never be shared.
+            </p>
           </div>
         </div>
-
       </div>
-    </main >
+    </main>
   );
 }
