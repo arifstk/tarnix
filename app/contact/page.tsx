@@ -102,15 +102,15 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 py-12">
-      <div className='px-3'>
+    <main className="min-h-screen py-10">
+      <div className='px-1'>
 
         {/* ── Page header ── */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold px-4 py-1.5 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold px-2 py-1.5 rounded-full mb-4">
             💬 Get in Touch
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight mb-3">
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight mb-3">
             Contact Us
           </h1>
           <p className="text-slate-400 text-sm max-w-md mx-auto">
@@ -175,7 +175,7 @@ export default function ContactPage() {
 
           {/* ── RIGHT: Form ── */}
           <div className="md:col-span-2">
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-7 space-y-5">
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-3 md:p-6 space-y-5">
               <div>
                 <h2 className="text-lg font-black text-slate-800">
                   Send a Message
@@ -254,7 +254,7 @@ export default function ContactPage() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -271,7 +271,7 @@ export default function ContactPage() {
                 )}
               </button>
 
-              <p className="text-xs text-slate-400 text-center">
+              <p className="text-xs text-slate-400 text-center tracking-tighter">
                 🔒 Your information is private and will never be shared.
               </p>
             </div>
