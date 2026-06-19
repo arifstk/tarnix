@@ -11,7 +11,7 @@ interface FooterProps {
   } | null;
 }
 
-export default function Footer ({ user }: FooterProps) {
+export default function Footer({ user }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   const isNormalUser = user?.role === "user";
@@ -82,7 +82,8 @@ export default function Footer ({ user }: FooterProps) {
             <span className='text-zinc-200'> | </span>
             <Link href="/terms" className="hover:text-zinc-600 transition-colors">Terms of Service</Link>
           </div>
-          <p className='tracking-widest'>developed by: arif</p>
+          <p className='tracking-widest'>developed by: <Link href="https://arif-portfolio-eosin.vercel.app/" className="hover:text-zinc-600 transition-colors">arif hossain</Link>
+          </p>
         </div>
       </div>
     </footer>
