@@ -11,11 +11,12 @@ import CategoriesSection from "./CategoriesSection";
 import OrdersSection from "./OrdersSection";
 import OverviewSection from "./OverviewSection";
 import UsersSection from "./UserSection";
+import MessagesSection from "./MessagesSection";
 
 // ─── Types ────────────────────────────────────────────────────
 type Role = "user" | "admin" | "deliveryBoy";
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-type Section = "overview" | "users" | "products" | "categories" | "orders" | "settings";
+type Section = "overview" | "users" | "products" | "categories" | "orders" | "messages" | "settings";
 
 interface User { id: string; name: string; email: string; role: Role; joined: string; avatar: string; orders: number; }
 interface Product { id: string; name: string; category: string; price: number; stock: number; image: string; status: "active" | "draft"; }
@@ -121,6 +122,7 @@ const NAV = [
   { id: "categories", label: "Categories", icon: "🏷" },
   { id: "products", label: "Products", icon: "📦" },
   { id: "orders", label: "Orders", icon: "📋" },
+  { id: "messages", label: "Messages", icon: "💬" },
   { id: "settings", label: "Settings", icon: "⚙" },
 ] as const;
 
@@ -295,6 +297,9 @@ export default function AdminDashboard() {
           {/* ══ ORDERS ════════════════════════════════════════ */}
 
           {section === "orders" && (<OrdersSection />)}
+
+          {/* ══ MESSAGES ════════════════════════════════════════ */}
+          {section === "messages" && <MessagesSection />}
 
           {/* ══ SETTINGS ══════════════════════════════════════ */}
           {section === "settings" && (
