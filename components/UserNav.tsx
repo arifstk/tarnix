@@ -31,7 +31,7 @@ const UserNav = ({ role }: UserNavProps) => {
           >
             {link.label}
             {link.label === "New Arrival" && (
-              <span className="absolute -top-2 -right-3 text-xs bg-rose-500 text-white px-1 rounded-full tracking-tighter">
+              <span className="absolute -top-2 -right-3 text-xs bg-rose-500 text-white px-1 rounded-full tracking-tighter animate-pulse">
                 NEW
               </span>
             )}
