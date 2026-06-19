@@ -2,8 +2,19 @@ import React from 'react';
 import Link from 'next/link';
 import SocialLinks from './common/SocialLinks';
 
-export default function Footer() {
+interface FooterProps {
+  user?: {
+    role?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  } | null;
+}
+
+export default function Footer ({ user }: FooterProps) {
   const currentYear = new Date().getFullYear();
+
+  const isNormalUser = user?.role === "user";
 
   return (
     <footer className="bg-white text-zinc-900 border-t border-zinc-100">
@@ -24,7 +35,9 @@ export default function Footer() {
           <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">Assistance</h4>
           <ul className="space-y-2.5 text-sm text-zinc-600">
             <li><Link href="/shipping-policy" className="hover:text-zinc-900 transition-colors">Delivery & Returns</Link></li>
-            <li><Link href="/my-orders" className="hover:text-zinc-900 transition-colors">Track Order</Link></li>
+            {isNormalUser &&
+              <li><Link href="/my-orders" className="hover:text-zinc-900 transition-colors">Track Order</Link></li>
+            }
             <li><Link href="/story" className="hover:text-zinc-900 transition-colors">Our Story</Link></li>
             <li><Link href="/contact" className="hover:text-zinc-900 transition-colors">Contact Us</Link></li>
           </ul>
