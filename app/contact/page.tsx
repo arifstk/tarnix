@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import SocialLinks from "@/components/common/SocialLinks";
 
 const SUBJECTS = [
   "General Inquiry",
@@ -216,7 +217,7 @@ export default function ContactPage() {
               ))}
 
               {/* Social links — only if set by admin */}
-              {(() => {
+              {/* {(() => {
                 const socials = [
                   { label: "Facebook", href: storeSettings?.facebook, color: "bg-blue-50 text-blue-600 border-blue-100" },
                   { label: "Instagram", href: storeSettings?.instagram, color: "bg-pink-50 text-pink-600 border-pink-100" },
@@ -246,7 +247,15 @@ export default function ContactPage() {
                     </div>
                   </div>
                 );
-              })()}
+              })()} */}
+
+              <div className="bg-white rounded-md border border-slate-100 shadow-sm p-5">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                  Follow Us
+                </p>
+                <SocialLinks />
+              </div>
+
             </>
           )}
         </div>

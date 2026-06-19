@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import SocialLinks from './common/SocialLinks';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -51,13 +52,8 @@ export default function Footer() {
 
         {/* Social Links */}
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">Social Links</h4>
-          <ul className="space-y-2.5 text-sm text-zinc-600">
-            <li><Link href="/shipping" className="hover:text-zinc-900 transition-colors">Delivery & Returns</Link></li>
-            <li><Link href="/track" className="hover:text-zinc-900 transition-colors">Track Order</Link></li>
-            <li><Link href="/about" className="hover:text-zinc-900 transition-colors">Our Story</Link></li>
-            <li><Link href="/contact" className="hover:text-zinc-900 transition-colors">Contact Us</Link></li>
-          </ul>
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">Follow Us</h4>
+          <SocialLinks />
         </div>
 
       </div>
@@ -79,3 +75,4 @@ export default function Footer() {
     </footer>
   );
 }
+

@@ -10,6 +10,7 @@ const USER_NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/newArrival", label: "New Arrival" },
   { href: "/shop", label: "Shop" },
+  { href: "/contact", label: "Contact" },
   { href: "/about", label: "About Us" },
 ];
 
