@@ -27,7 +27,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <HeaderWrapper />
-          <main className='w-[95%] md:w-[90%] mx-auto'>
+          <main className='w-[92%] md:w-[90%] mx-auto'>
             {children}
             <Toaster
               position="top-right"
