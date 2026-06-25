@@ -865,7 +865,7 @@ export default function ProfilePage() {
       role === "deliveryBoy" ? "/delivery/dashboard" : null;
 
   return (
-    <main className="min-h-screen bg-slate-50 py-10 px-4">
+    <main className="min-h-screen bg-slate-50 py-10">
       <div className="max-w-2xl mx-auto space-y-5">
 
         {/* ── Page header ── */}
