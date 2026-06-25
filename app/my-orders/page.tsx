@@ -470,7 +470,7 @@ export default function MyOrdersPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 py-10">
-      <div className="max-w-3xl mx-auto px-4">
+      <div className="max-w-3xl mx-auto">
 
         {/* Header */}
         <div className="mb-6">
