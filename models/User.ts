@@ -8,6 +8,8 @@ export interface IUserDoc extends Document {
   image?: string;
   password?: string;
   role: "user" | "admin" |"deliveryBoy";
+  mobile?: string;
+  cloudinaryId?: string;
 }
 
 const UserSchema = new Schema<IUserDoc>(
@@ -17,6 +19,8 @@ const UserSchema = new Schema<IUserDoc>(
     image: { type: String },
     password: { type: String },
     role: { type: String, enum: ["user", "admin", "deliveryBoy"], default: "user" },
+    mobile:        { type: String, default: "" },
+    cloudinaryId:  { type: String, default: "" },
   },
   { timestamps: true },
 );

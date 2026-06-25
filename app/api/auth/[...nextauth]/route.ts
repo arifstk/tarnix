@@ -32,7 +32,9 @@ export const authOptions: AuthOptions = {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
+          image: user.image || null,
           role: user.role,
+          mobile: user.mobile,
         };
       },
     }),
@@ -59,7 +61,7 @@ export const authOptions: AuthOptions = {
       return true;
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session: updateSession }) {
       await connectDB();
       console.log("JWT token.email:", token.email);
       const dbUser = await User.findOne({ email: token.email });
@@ -71,8 +73,19 @@ export const authOptions: AuthOptions = {
         return token;
       }
 
-      token.role = dbUser.role;
-      token.id = dbUser._id.toString();
+      token.id     = dbUser._id.toString();
+      token.name   = dbUser.name;
+      token.email  = dbUser.email;
+      token.image  = dbUser.image  || null;
+      token.role   = dbUser.role;
+      token.mobile = dbUser.mobile || "";
+
+      if (trigger === "update" && updateSession) {
+        if (updateSession.name)   token.name   = updateSession.name;
+        if (updateSession.image)  token.image  = updateSession.image;
+        if (updateSession.email)  token.email  = updateSession.email;
+        if (updateSession.mobile) token.mobile = updateSession.mobile;
+      }
       return token;
     },
 
@@ -86,8 +99,12 @@ export const authOptions: AuthOptions = {
         };
       }
       if (session.user) {
-        (session.user as any).role = token.role;
-        (session.user as any).id = token.id;
+        (session.user as any).id     = token.id;
+        (session.user as any).role   = token.role;
+        (session.user as any).mobile = token.mobile;
+        session.user.name            = token.name  as string;
+        session.user.image           = token.image as string;
+        session.user.email           = token.email as string;
       }
       return session;
     },
