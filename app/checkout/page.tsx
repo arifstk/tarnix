@@ -72,7 +72,7 @@ export default function CheckoutPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 py-10">
-      <div className="max-w-5xl mx-auto px-4">
+      <div>
         <h1 className="text-2xl font-bold text-slate-800 mb-8">Checkout</h1>
 
         {stripeError && (

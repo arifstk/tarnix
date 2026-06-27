@@ -202,7 +202,7 @@ function TopProductCard({
               : "bg-slate-100 text-slate-400"
             }`}
         >
-          {isInCart ? "✓ In Cart" : inStock ? "Add to Cart" : "Out of Stock"}
+          {isInCart ? "✓ Added to Cart !" : inStock ? "Add to Cart" : "Out of Stock"}
         </button>
       </div>
     </Link>

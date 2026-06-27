@@ -226,7 +226,7 @@ function NewProductCard({
               : "bg-indigo-600 text-white hover:bg-indigo-500 cursor-pointer"
             }`}
         >
-          {isOutOfStock ? "Out of Stock" : isAdded ? "✓ Added!" : "Add to Cart"}
+          {isOutOfStock ? "Out of Stock" : isAdded ? "✓ Added to Cart !" : "Add to Cart"}
         </button>
       </div>
     </div>

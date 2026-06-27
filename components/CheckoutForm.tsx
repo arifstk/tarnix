@@ -547,7 +547,7 @@ export default function CheckoutForm({ cart, subtotal, clientSecret, deliveryCha
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <h2 className="text-base font-bold text-slate-800 mb-4">Payment Method</h2>
 
-          <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
             <button
               onClick={() => setPaymentMethod("cod")}
               className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${paymentMethod === "cod"

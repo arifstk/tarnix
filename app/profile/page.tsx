@@ -977,7 +977,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-3">
               {[
                 { label: "My Orders", href: "/my-orders", icon: "📦" },
-                { label: "Shop Now", href: "/products", icon: "🛍" },
+                { label: "Shop Now", href: "/shop", icon: "🛍" },
                 { label: "Cart", href: "/cart", icon: "🛒" },
                 { label: "Contact Us", href: "/contact", icon: "💬" },
               ].map((link) => (
